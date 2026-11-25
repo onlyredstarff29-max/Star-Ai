@@ -18,11 +18,11 @@ const FALLBACK_CHAIN = [
 export async function onRequestGet(context) {
   return Response.json({
     providers: {
-      gemini: Boolean(context.env.GEMINI_API_KEY),
-      groq: Boolean(context.env.GROQ_API_KEY),
-      openrouter: Boolean(context.env.OPENROUTER_API_KEY),
-      cerebras: Boolean(context.env.CEREBRAS_API_KEY),
-      mistral: Boolean(context.env.MISTRAL_API_KEY),
+      gemini: Boolean(String(context.env.GEMINI_API_KEY || "").trim()),
+      groq: Boolean(String(context.env.GROQ_API_KEY || "").trim()),
+      openrouter: Boolean(String(context.env.OPENROUTER_API_KEY || "").trim()),
+      cerebras: Boolean(String(context.env.CEREBRAS_API_KEY || "").trim()),
+      mistral: Boolean(String(context.env.MISTRAL_API_KEY || "").trim()),
     },
   });
 }
@@ -94,8 +94,8 @@ async function openUpstream(candidate, apiKey, messages, fullSystemPrompt) {
   const ctrl = new AbortController();
   const timeout = setTimeout(() => ctrl.abort(), 14000);
 
-  let res;
   try {
+    let res;
     if (provider === "gemini") {
       const isGemma = model.startsWith("gemma-");
       const contents = messages.map((m, idx) => {
@@ -159,7 +159,6 @@ async function openUpstream(candidate, apiKey, messages, fullSystemPrompt) {
       throw new Error(`${provider} ${res.status}: ${errBody.slice(0, 120)}`);
     }
 
-    // প্রথম আসল টোকেন পাওয়া পর্যন্ত অপেক্ষা—যাতে স্ট্রিম এরর হলেই আগে ফ্যালব্যাক হয়!
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
@@ -230,11 +229,11 @@ export async function onRequestPost(context) {
     }
 
     const keys = {
-      gemini: clientKeys.gemini || context.env.GEMINI_API_KEY || "",
-      groq: clientKeys.groq || context.env.GROQ_API_KEY || "",
-      openrouter: clientKeys.openrouter || context.env.OPENROUTER_API_KEY || "",
-      cerebras: clientKeys.cerebras || context.env.CEREBRAS_API_KEY || "",
-      mistral: clientKeys.mistral || context.env.MISTRAL_API_KEY || "",
+      gemini: String(clientKeys.gemini || context.env.GEMINI_API_KEY || "").trim(),
+      groq: String(clientKeys.groq || context.env.GROQ_API_KEY || "").trim(),
+      openrouter: String(clientKeys.openrouter || context.env.OPENROUTER_API_KEY || "").trim(),
+      cerebras: String(clientKeys.cerebras || context.env.CEREBRAS_API_KEY || "").trim(),
+      mistral: String(clientKeys.mistral || context.env.MISTRAL_API_KEY || "").trim(),
     };
 
     const candidates = buildCandidateList(model, keys);
@@ -242,7 +241,7 @@ export async function onRequestPost(context) {
       return Response.json(
         {
           error:
-            "কোনো API Key সেট করা নেই! Cloudflare Settings -> Variables & Secrets-এ অন্তত একটি Key (যেমন GEMINI_API_KEY বা GROQ_API_KEY) বসান অথবা ⚙️ Settings থেকে দিন।",
+            "কোনো API Key পাওয়া যায়নি! Cloudflare Settings -> Variables & Secrets-এ অন্তত একটি Key (GEMINI_API_KEY / GROQ_API_KEY / OPENROUTER_API_KEY / CEREBRAS_API_KEY / MISTRAL_API_KEY) যোগ করুন অথবা ⚙️ Settings থেকে দিন।",
         },
         { status: 400 }
       );
