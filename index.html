@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="google" content="notranslate" />
-  <title>Star AI — Universal Smart Assistant</title>
+  <title>Star AI — Smart Multilingual Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
   <style>
     :root {
-      --bg-main: #090b10;
-      --bg-sidebar: #10131b;
-      --bg-elevated: #161a26;
-      --bg-hover: #202638;
-      --bg-user-msg: linear-gradient(135deg, #283352, #1c243d);
+      --bg-main: #080a10;
+      --bg-sidebar: #0f121b;
+      --bg-elevated: #161a27;
+      --bg-hover: #20263a;
+      --bg-user-msg: linear-gradient(135deg, #283454, #1c243d);
       --border: rgba(255, 255, 255, 0.085);
       --text-main: #f1f5f9;
       --text-muted: #94a3b8;
@@ -24,8 +24,10 @@
       --accent-2: #6366f1;
       --danger: #ef4444;
       --ok: #10b981;
+      --bkash: #e2136e;
+      --nagad: #f76b1c;
       --code-bg: #0c1017;
-      --shadow: 0 14px 42px rgba(0, 0, 0, 0.48);
+      --shadow: 0 14px 42px rgba(0, 0, 0, 0.5);
     }
 
     [data-theme="light"] {
@@ -38,13 +40,12 @@
       --text-main: #0f172a;
       --text-muted: #64748b;
       --accent: #d97706;
-      --accent-glow: rgba(217, 119, 6, 0.18);
+      --accent-glow: rgba(217, 119, 6, 0.16);
       --code-bg: #0f172a;
       --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body {
       height: 100%;
       background: var(--bg-main);
@@ -53,24 +54,18 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    .app-layout { display: flex; height: 100dvh; width: 100%; overflow: hidden; }
-
+    .hidden { display: none !important; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 99px; }
+
+    .app-layout { display: flex; height: 100dvh; width: 100%; overflow: hidden; }
 
     /* Sidebar */
     .sidebar {
-      width: 274px;
-      background: var(--bg-sidebar);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
+      width: 274px; background: var(--bg-sidebar); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0; z-index: 40;
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-      z-index: 40;
     }
-
     .sidebar-header { padding: 16px; display: flex; align-items: center; justify-content: space-between; }
     .brand { display: flex; align-items: center; gap: 10px; }
     .brand-icon {
@@ -79,20 +74,14 @@
       color: #fff; display: grid; place-items: center; font-size: 18px;
       box-shadow: 0 0 18px var(--accent-glow);
     }
-    .brand-text { display: flex; align-items: center; gap: 7px; }
     .brand-name { font-weight: 700; font-size: 18px; }
-    .brand-badge {
-      font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 99px;
-      background: rgba(245, 158, 11, 0.16); color: var(--accent);
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
+    .brand-sub { font-size: 10.5px; color: var(--accent); font-weight: 700; }
 
     .sidebar-actions { padding: 0 14px 12px; display: flex; flex-direction: column; gap: 10px; }
     .new-chat-btn {
-      width: 100%; padding: 10px 14px; border-radius: 12px;
-      border: 1px solid var(--border); background: var(--bg-elevated);
-      color: var(--text-main); font-family: inherit; font-size: 14px; font-weight: 600;
-      display: flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s;
+      width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--bg-elevated); color: var(--text-main); font-family: inherit;
+      font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer;
     }
     .new-chat-btn:hover { background: var(--bg-hover); border-color: var(--accent); }
 
@@ -108,78 +97,99 @@
 
     .history-label { padding: 4px 16px 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
     .chat-list { flex: 1; overflow-y: auto; padding: 0 10px 12px; display: flex; flex-direction: column; gap: 4px; }
-
     .chat-item {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 11px; border-radius: 10px; cursor: pointer;
-      font-size: 13.5px; color: var(--text-muted); transition: 0.15s;
+      padding: 9px 11px; border-radius: 10px; cursor: pointer; font-size: 13.5px; color: var(--text-muted);
     }
-    .chat-item:hover { background: var(--bg-hover); color: var(--text-main); }
-    .chat-item.active { background: var(--bg-hover); color: var(--text-main); font-weight: 600; }
+    .chat-item:hover, .chat-item.active { background: var(--bg-hover); color: var(--text-main); }
+    .chat-item.active { font-weight: 600; }
     .chat-item-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    .chat-del-btn {
-      opacity: 0; background: transparent; border: none; color: var(--text-muted);
-      cursor: pointer; padding: 2px 6px; border-radius: 6px; font-size: 12px;
-    }
+    .chat-del-btn { opacity: 0; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 2px 6px; }
     .chat-item:hover .chat-del-btn { opacity: 1; }
-    .chat-del-btn:hover { color: var(--danger); background: rgba(239, 68, 68, 0.12); }
+    .chat-del-btn:hover { color: var(--danger); }
 
-    .sidebar-footer { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
-    .footer-btn {
-      display: flex; align-items: center; gap: 8px; padding: 8px 10px;
-      border-radius: 9px; border: none; background: transparent; color: var(--text-muted);
-      font-family: inherit; font-size: 13px; cursor: pointer; transition: 0.2s;
+    .pro-sidebar-card {
+      margin: 0 12px 10px; padding: 12px; border-radius: 14px; cursor: pointer;
+      background: linear-gradient(135deg, rgba(245,158,11,0.14), rgba(99,102,241,0.14));
+      border: 1px solid rgba(245,158,11,0.3); transition: 0.2s;
     }
-    .footer-btn.danger:hover { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
-    .footer-meta { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); padding: 0 6px; }
-    .status-dot.online { color: var(--ok); font-weight: 600; }
-    .status-dot.warn { color: var(--accent); font-weight: 600; }
+    .pro-sidebar-card:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .pro-sidebar-card strong { display: block; font-size: 13.5px; color: var(--accent); }
+    .pro-sidebar-card span { font-size: 12px; color: var(--text-muted); }
 
-    /* Main Workspace */
+    .sidebar-footer { padding: 10px 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; }
+    .footer-btn {
+      display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 9px;
+      border: none; background: transparent; color: var(--text-muted); font-family: inherit; font-size: 13px; cursor: pointer;
+    }
+    .footer-btn:hover { color: var(--danger); background: rgba(239,68,68,0.1); }
+    .footer-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); padding: 0 6px; }
+
+    /* Main Area */
     .main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+
+    .notice-banner {
+      background: linear-gradient(90deg, rgba(245,158,11,0.18), rgba(99,102,241,0.18));
+      border-bottom: 1px solid rgba(245,158,11,0.3);
+      padding: 8px 16px; font-size: 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .notice-close { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; }
 
     .topbar {
       height: 60px; padding: 0 14px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--bg-main); gap: 8px; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--bg-main);
     }
     .topbar-left, .topbar-right { display: flex; align-items: center; gap: 8px; min-width: 0; }
 
-    .model-picker-wrap {
-      display: flex; align-items: center; gap: 6px; padding: 6px 10px;
-      border-radius: 10px; background: var(--bg-elevated); border: 1px solid var(--border);
-      max-width: 245px;
+    /* Tier Switcher */
+    .tier-switch {
+      display: flex; background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 12px; padding: 3px; gap: 3px;
     }
-    .spark-mini { color: var(--accent); font-size: 14px; flex-shrink: 0; }
-    .model-select, .lang-select {
-      background: transparent; border: none; outline: none; color: var(--text-main);
-      font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; min-width: 0;
+    .tier-btn {
+      border: none; background: transparent; color: var(--text-muted);
+      padding: 6px 12px; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; white-space: nowrap;
     }
+    .tier-btn.active { background: var(--bg-hover); color: var(--text-main); }
+    .tier-btn.pro-active { background: linear-gradient(135deg, var(--accent), #ea580c); color: #fff; }
+    .pro-badge-mini {
+      font-size: 10px; padding: 1px 6px; border-radius: 99px;
+      background: rgba(245,158,11,0.18); color: var(--accent);
+    }
+
     .lang-select {
       padding: 6px 8px; border-radius: 10px; background: var(--bg-elevated);
-      border: 1px solid var(--border); font-size: 12.5px;
+      border: 1px solid var(--border); color: var(--text-main); font-family: inherit; font-size: 12.5px; font-weight: 600; outline: none;
     }
-    .model-select option, .model-select optgroup, .lang-select option {
-      background: var(--bg-elevated); color: var(--text-main);
-    }
+    .lang-select option { background: var(--bg-elevated); color: var(--text-main); }
 
     .icon-btn {
       width: 36px; height: 36px; border-radius: 10px; border: 1px solid transparent;
-      background: transparent; color: var(--text-muted); display: grid; place-items: center;
-      cursor: pointer; transition: 0.2s; flex-shrink: 0;
+      background: transparent; color: var(--text-muted); display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
     }
     .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--border); }
 
+    .upgrade-top-btn {
+      padding: 6px 12px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--accent), #ea580c);
+      color: #fff; font-family: inherit; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .upgrade-top-btn.is-pro { background: rgba(16,185,129,0.16); color: var(--ok); border: 1px solid rgba(16,185,129,0.35); }
+
+    /* Maintenance */
+    .maint-screen {
+      flex: 1; display: grid; place-items: center; padding: 24px; text-align: center;
+    }
+    .maint-box { max-width: 420px; background: var(--bg-elevated); border: 1px solid var(--border); padding: 28px; border-radius: 20px; }
+
     /* Chat Container */
     .chat-container { flex: 1; overflow-y: auto; padding: 22px 16px 32px; scroll-behavior: smooth; }
-
-    .welcome-screen { max-width: 720px; margin: 40px auto 0; text-align: center; animation: msgFade 0.35s ease; }
+    .welcome-screen { max-width: 720px; margin: 36px auto 0; text-align: center; animation: msgFade 0.35s ease; }
     .welcome-emblem {
       width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 20px;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #fff; display: grid; place-items: center; font-size: 32px;
-      box-shadow: 0 0 40px var(--accent-glow);
+      color: #fff; display: grid; place-items: center; font-size: 32px; box-shadow: 0 0 40px var(--accent-glow);
     }
     .welcome-screen h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
     .welcome-screen p { color: var(--text-muted); font-size: 15px; margin-bottom: 28px; }
@@ -191,7 +201,6 @@
       display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: 0.2s;
     }
     .suggestion-card:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow); }
-    .s-icon { font-size: 20px; line-height: 1.2; }
     .suggestion-card strong { display: block; font-size: 14px; margin-bottom: 2px; }
     .suggestion-card span { font-size: 12.5px; color: var(--text-muted); }
 
@@ -200,18 +209,12 @@
     .msg-row { display: flex; gap: 12px; animation: msgFade 0.25s ease; }
     .msg-row.user { justify-content: flex-end; align-items: flex-end; gap: 8px; }
 
-    .msg-edit-btn {
-      opacity: 0; background: transparent; border: none; color: var(--text-muted);
-      cursor: pointer; padding: 6px; border-radius: 8px; font-size: 13px; transition: 0.15s;
-    }
+    .msg-edit-btn { opacity: 0; background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; font-size: 13px; }
     .msg-row.user:hover .msg-edit-btn { opacity: 1; }
-    .msg-edit-btn:hover { background: var(--bg-hover); color: var(--text-main); }
-
     .user-bubble {
       background: var(--bg-user-msg); color: #fff; padding: 12px 17px;
-      border-radius: 18px 18px 4px 18px; max-width: 82%; font-size: 15px;
-      line-height: 1.6; white-space: pre-wrap; word-break: break-word;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+      border-radius: 18px 18px 4px 18px; max-width: 82%; font-size: 15px; line-height: 1.6;
+      white-space: pre-wrap; word-break: break-word;
     }
 
     .bot-avatar {
@@ -219,38 +222,23 @@
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: #fff; display: grid; place-items: center; font-size: 15px; flex-shrink: 0; margin-top: 2px;
     }
-
     .bot-content-wrap { flex: 1; min-width: 0; }
-
     .markdown-body { font-size: 15.2px; line-height: 1.75; word-break: break-word; }
     .markdown-body p { margin-bottom: 12px; }
     .markdown-body p:last-child { margin-bottom: 0; }
-    .markdown-body h1, .markdown-body h2, .markdown-body h3 { margin: 16px 0 8px; font-weight: 700; }
     .markdown-body ul, .markdown-body ol { margin: 8px 0 12px 22px; }
-    .markdown-body li { margin-bottom: 4px; }
-    .markdown-body blockquote {
-      border-left: 3px solid var(--accent); padding: 6px 14px; margin: 10px 0;
-      background: rgba(245, 158, 11, 0.06); border-radius: 0 8px 8px 0; color: var(--text-muted);
-    }
     .markdown-body code:not(pre code) {
-      background: rgba(148, 163, 184, 0.16); padding: 2px 6px; border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.86em;
+      background: rgba(148, 163, 184, 0.16); padding: 2px 6px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.86em;
     }
     .markdown-body table { width: 100%; border-collapse: collapse; margin: 12px 0; display: block; overflow-x: auto; }
-    .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; font-size: 14px; }
-    .markdown-body th { background: var(--bg-elevated); }
+    .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px 12px; font-size: 14px; }
 
-    .code-block-wrap { margin: 14px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); background: var(--code-bg); }
+    .code-block-wrap { margin: 14px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: var(--code-bg); }
     .code-block-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 7px 14px; background: rgba(255, 255, 255, 0.05);
-      color: #94a3b8; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+      padding: 7px 14px; background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 12px; font-family: 'JetBrains Mono', monospace;
     }
-    .code-copy-btn {
-      background: rgba(255, 255, 255, 0.08); border: none; color: #e2e8f0;
-      padding: 3px 9px; border-radius: 6px; font-size: 11.5px; cursor: pointer;
-    }
-    .code-copy-btn:hover { background: rgba(255, 255, 255, 0.18); }
+    .code-copy-btn { background: rgba(255,255,255,0.08); border: none; color: #e2e8f0; padding: 3px 9px; border-radius: 6px; font-size: 11.5px; cursor: pointer; }
     .code-block-wrap pre { margin: 0; padding: 14px; overflow-x: auto; }
     .code-block-wrap code { font-family: 'JetBrains Mono', monospace; font-size: 13.2px; line-height: 1.55; }
 
@@ -262,9 +250,9 @@
     .msg-act-btn:hover { color: var(--text-main); background: var(--bg-hover); }
     .reply-meta-badge {
       font-size: 11.5px; color: var(--text-muted); padding: 3px 9px;
-      border-radius: 99px; background: rgba(148, 163, 184, 0.09); border: 1px solid var(--border);
+      border-radius: 99px; background: rgba(148,163,184,0.09); border: 1px solid var(--border);
     }
-    .reply-meta-badge.fallback { color: var(--accent); border-color: rgba(245, 158, 11, 0.35); }
+    .reply-meta-badge.pro { color: var(--accent); border-color: rgba(245,158,11,0.35); }
 
     .typing-dots { display: inline-flex; gap: 5px; padding: 8px 4px; }
     .typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: bounce 1.2s infinite ease-in-out; }
@@ -276,93 +264,100 @@
     .input-box {
       max-width: 780px; margin: 0 auto; background: var(--bg-elevated);
       border: 1px solid var(--border); border-radius: 20px; padding: 7px 10px;
-      display: flex; align-items: flex-end; gap: 6px; box-shadow: var(--shadow); transition: 0.2s;
+      display: flex; align-items: flex-end; gap: 6px; box-shadow: var(--shadow);
     }
     .input-box:focus-within { border-color: var(--accent); }
     .input-box textarea {
       flex: 1; background: transparent; border: none; outline: none; resize: none;
-      color: var(--text-main); font-family: inherit; font-size: 15px; line-height: 1.5;
-      padding: 7px 4px; max-height: 170px;
+      color: var(--text-main); font-family: inherit; font-size: 15px; line-height: 1.5; padding: 7px 4px; max-height: 170px;
     }
-
     .mic-lang-btn {
       height: 34px; padding: 0 8px; border-radius: 10px; border: 1px solid var(--border);
-      background: transparent; color: var(--text-muted); font-family: inherit;
-      font-size: 11.5px; font-weight: 700; cursor: pointer; flex-shrink: 0; margin-bottom: 2px;
+      background: transparent; color: var(--text-muted); font-family: inherit; font-size: 11.5px; font-weight: 700; cursor: pointer;
     }
-    .mic-lang-btn:hover { color: var(--text-main); background: var(--bg-hover); }
-
     .dock-icon-btn {
-      width: 36px; height: 36px; border-radius: 12px; border: none;
-      background: transparent; color: var(--text-muted); display: grid; place-items: center;
-      cursor: pointer; flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 12px; border: none; background: transparent;
+      color: var(--text-muted); display: grid; place-items: center; cursor: pointer;
     }
-    .dock-icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
-    .dock-icon-btn.listening { color: var(--danger); background: rgba(239, 68, 68, 0.14); animation: pulse 1.2s infinite; }
-
+    .dock-icon-btn.listening { color: var(--danger); background: rgba(239,68,68,0.14); }
     .send-btn {
       width: 38px; height: 38px; border-radius: 12px; border: none;
-      background: linear-gradient(135deg, var(--accent), #ea580c);
-      color: #fff; display: grid; place-items: center; cursor: pointer; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), #ea580c); color: #fff; display: grid; place-items: center; cursor: pointer;
     }
     .send-btn.stop { background: var(--danger); }
     .disclaimer { text-align: center; font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
 
-    /* Modal */
+    /* Upgrade / Payment Modal */
     .modal {
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(6px);
-      display: grid; place-items: center; padding: 16px; z-index: 60;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(7px);
+      display: grid; place-items: center; padding: 14px; z-index: 60;
     }
     .modal-card {
-      width: 100%; max-width: 500px; max-height: 90dvh; display: flex; flex-direction: column;
-      background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 18px;
-      box-shadow: var(--shadow); overflow: hidden;
+      width: 100%; max-width: 510px; max-height: 92dvh; display: flex; flex-direction: column;
+      background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden;
     }
     .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .modal-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
-    .modal-footer { padding: 13px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+    .modal-body { padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
 
-    .provider-status-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
-    .provider-pill {
-      font-size: 12px; padding: 4px 10px; border-radius: 99px;
-      border: 1px solid var(--border); color: var(--text-muted); background: var(--bg-main);
+    .price-hero {
+      padding: 14px 16px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(245,158,11,0.14), rgba(99,102,241,0.14));
+      border: 1px solid rgba(245,158,11,0.35); display: flex; align-items: center; justify-content: space-between;
     }
-    .provider-pill.active { color: var(--ok); border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); }
+    .price-big { font-size: 26px; font-weight: 700; color: var(--accent); }
 
-    .keys-grid { display: flex; flex-direction: column; gap: 8px; }
-    .field-label { font-size: 13px; font-weight: 600; }
-    .field-label-sm { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
-    .field-hint { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+    .pay-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .pay-logo-card {
+      padding: 12px; border-radius: 14px; border: 2px solid var(--border); background: var(--bg-main);
+      cursor: pointer; text-align: left; transition: 0.2s; color: var(--text-main); font-family: inherit;
+    }
+    .pay-logo-card.bkash.selected, .pay-logo-card.bkash:hover { border-color: var(--bkash); background: rgba(226,19,110,0.08); }
+    .pay-logo-card.nagad.selected, .pay-logo-card.nagad:hover { border-color: var(--nagad); background: rgba(247,107,28,0.08); }
+    .pay-brand-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .pay-num { font-family: 'JetBrains Mono', monospace; font-size: 13.5px; font-weight: 700; }
+    .pay-type-tag { font-size: 11px; color: var(--text-muted); }
+
+    .guide-box {
+      padding: 11px 13px; border-radius: 12px; background: rgba(245,158,11,0.09);
+      border: 1px solid rgba(245,158,11,0.28); font-size: 12.5px; line-height: 1.6;
+    }
     .field-input {
-      width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 13px; outline: none;
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 13.5px; outline: none;
     }
     .field-input:focus { border-color: var(--accent); }
-    .divider { height: 1px; background: var(--border); margin: 4px 0; }
     .primary-btn {
-      padding: 9px 20px; border-radius: 10px; border: none;
+      width: 100%; padding: 10px 16px; border-radius: 11px; border: none;
       background: linear-gradient(135deg, var(--accent), #ea580c);
-      color: #fff; font-family: inherit; font-weight: 600; font-size: 14px; cursor: pointer;
+      color: #fff; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer;
+    }
+    .secondary-btn {
+      width: 100%; padding: 9px 14px; border-radius: 11px; border: 1px solid var(--border);
+      background: var(--bg-hover); color: var(--text-main); font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer;
+    }
+    .divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .status-msg { font-size: 12.5px; min-height: 16px; }
+
+    .toast {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      background: var(--bg-elevated); border: 1px solid var(--accent); color: var(--text-main);
+      padding: 10px 18px; border-radius: 12px; font-size: 13.5px; box-shadow: var(--shadow); z-index: 90;
     }
 
-    .hidden { display: none !important; }
     .mobile-only { display: none; }
     .sidebar-overlay { display: none; }
-
     @keyframes msgFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
     @media (max-width: 768px) {
       .mobile-only { display: grid; }
       .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
       .sidebar-overlay.open { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 30; }
-      .suggestion-grid { grid-template-columns: 1fr; }
-      .welcome-screen { margin-top: 18px; }
-      .user-bubble { max-width: 90%; }
-      .model-picker-wrap { max-width: 155px; }
-      .lang-select { max-width: 90px; }
+      .suggestion-grid, .pay-cards { grid-template-columns: 1fr; }
+      .tier-btn { padding: 5px 8px; font-size: 12px; }
+      .upgrade-top-btn { padding: 6px 8px; font-size: 11.5px; }
+      .lang-select { max-width: 82px; font-size: 11.5px; }
     }
   </style>
 </head>
@@ -375,20 +370,18 @@
       <div class="sidebar-header">
         <div class="brand">
           <div class="brand-icon">✦</div>
-          <div class="brand-text">
-            <span class="brand-name">Star AI</span>
-            <span class="brand-badge">PRO</span>
+          <div>
+            <div class="brand-name" id="brandNameText">Star AI</div>
+            <div class="brand-sub">SMART ASSISTANT</div>
           </div>
         </div>
-        <button id="closeSidebarBtn" class="icon-btn mobile-only" title="বন্ধ করুন">✕</button>
+        <button id="closeSidebarBtn" class="icon-btn mobile-only">✕</button>
       </div>
 
       <div class="sidebar-actions">
         <button id="newChatBtn" class="new-chat-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
-          <span>নতুন চ্যাট</span>
+          <span>+</span> <span>নতুন চ্যাট</span>
         </button>
-
         <div class="search-box">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input id="chatSearch" type="text" placeholder="পুরোনো চ্যাট খুঁজুন..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
@@ -398,57 +391,40 @@
       <div class="history-label">সাম্প্রতিক চ্যাট</div>
       <div id="chatList" class="chat-list notranslate"></div>
 
+      <div id="proSidebarCard" class="pro-sidebar-card">
+        <strong id="sbProTitle">👑 Star AI 1.1 Pro নিন</strong>
+        <span id="sbProSub">মাত্র ১০০ টাকায় ৭ দিন আনলিমিটেড!</span>
+      </div>
+
       <div class="sidebar-footer">
-        <button id="clearAllBtn" class="footer-btn danger">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>
-          <span>সব চ্যাট মুছুন</span>
-        </button>
+        <button id="clearAllBtn" class="footer-btn">🗑 সব চ্যাট মুছুন</button>
         <div class="footer-meta">
           <span>© 2026 Star AI</span>
-          <span id="serverStatusBadge" class="status-dot" title="সার্ভার স্ট্যাটাস">● চেক হচ্ছে</span>
+          <span id="freeUsageBadge">1.0 Free</span>
         </div>
       </div>
     </aside>
 
-    <!-- Main Workspace -->
+    <!-- Main Area -->
     <main class="main-area">
+      <div id="noticeBanner" class="notice-banner hidden">
+        <span id="noticeText"></span>
+        <button id="closeNoticeBtn" class="notice-close">✕</button>
+      </div>
+
       <header class="topbar">
         <div class="topbar-left">
-          <button id="menuBtn" class="icon-btn mobile-only" title="মেনু">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-          </button>
+          <button id="menuBtn" class="icon-btn mobile-only">☰</button>
 
-          <div class="model-picker-wrap">
-            <span class="spark-mini">✦</span>
-            <select id="modelSelect" class="model-select" title="AI মডেল নির্বাচন করুন">
-              <option value="auto">⚡ Star Auto (অটো-ফ্যালব্যাক)</option>
-              <optgroup label="Google Gemini (Free)">
-                <option value="gemini::gemini-3.8-flash">Gemini 3.8 Flash</option>
-                <option value="gemini::gemini-3.6-flash">Gemini 3.6 Flash</option>
-                <option value="gemini::gemini-3.5-flash-lite">Gemini 3.5 Lite (হাই লিমিট)</option>
-                <option value="gemini::gemma-4-31b-it">Gemma 4 31B</option>
-              </optgroup>
-              <optgroup label="Groq (Free - Ultra Fast)">
-                <option value="groq::openai/gpt-oss-120b">Groq GPT-OSS 120B</option>
-                <option value="groq::openai/gpt-oss-20b">Groq GPT-OSS 20B</option>
-                <option value="groq::qwen/qwen3.8-27b">Groq Qwen 3.8 27B</option>
-              </optgroup>
-              <optgroup label="OpenRouter (Free)">
-                <option value="openrouter::openrouter/free">OpenRouter Free Auto</option>
-                <option value="openrouter::google/gemma-3-27b-it:free">OpenRouter Gemma 3 27B</option>
-                <option value="openrouter::qwen/qwen3-coder:free">OpenRouter Qwen3 Coder</option>
-              </optgroup>
-              <optgroup label="Cerebras (Free - Instant)">
-                <option value="cerebras::gpt-oss-120b">Cerebras GPT-OSS 120B</option>
-                <option value="cerebras::qwen-3-235b-a22b-instruct-2507">Cerebras Qwen 235B</option>
-              </optgroup>
-              <optgroup label="Mistral (Free)">
-                <option value="mistral::mistral-small-latest">Mistral Small</option>
-              </optgroup>
-            </select>
+          <div class="tier-switch">
+            <button id="tier10Btn" class="tier-btn active">✦ Star AI 1.0</button>
+            <button id="tier11Btn" class="tier-btn">
+              <span>👑 Star AI 1.1</span>
+              <span id="proLockIcon" class="pro-badge-mini">🔒 Pro</span>
+            </button>
           </div>
 
-          <select id="langSelect" class="lang-select" title="উত্তরের ভাষা">
+          <select id="langSelect" class="lang-select" title="ভাষা">
             <option value="auto">🌐 সব ভাষা</option>
             <option value="bn">বাংলা</option>
             <option value="banglish">Banglish</option>
@@ -459,53 +435,44 @@
         </div>
 
         <div class="topbar-right">
-          <button id="exportChatBtn" class="icon-btn" title="চ্যাট ডাউনলোড করুন">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          </button>
-          <button id="themeToggleBtn" class="icon-btn" title="ডার্ক / লাইট মোড">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          </button>
-          <button id="settingsBtn" class="icon-btn" title="সেটিংস ও ফ্রি API Keys">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.42 1.09H21a2 2 0 1 1 0 4h-.09c-.65.07-1.16.49-1.51 1.01z"/></svg>
-          </button>
+          <button id="upgradeTopBtn" class="upgrade-top-btn">👑 Pro নিন</button>
+          <button id="exportChatBtn" class="icon-btn" title="ডাউনলোড">⬇</button>
+          <button id="themeToggleBtn" class="icon-btn" title="ডার্ক / লাইট">◐</button>
         </div>
       </header>
 
-      <!-- Messages Viewport -->
+      <!-- Maintenance Mode Screen -->
+      <div id="maintScreen" class="maint-screen hidden">
+        <div class="maint-box">
+          <div style="font-size:40px; margin-bottom:10px;">🚧</div>
+          <h2 style="margin-bottom:8px;">সিস্টেম আপডেট চলছে</h2>
+          <p id="maintMsgText" style="color:var(--text-muted); font-size:14px;"></p>
+        </div>
+      </div>
+
+      <!-- Chat Viewport -->
       <div id="chatContainer" class="chat-container">
         <div id="welcomeScreen" class="welcome-screen notranslate">
           <div class="welcome-emblem">✦</div>
-          <h1>Star AI-তে স্বাগতম</h1>
-          <p>বিশ্বের যেকোনো ভাষা—বাংলা, Banglish, English, Hindi বা Arabic-এ প্রশ্ন করুন। অটো-ফ্যালব্যাক চালু আছে।</p>
+          <h1 id="welcomeTitle">Star AI-তে স্বাগতম</h1>
+          <p id="welcomeSub">বাংলা, Banglish ও বিশ্বের যেকোনো ভাষায় প্রশ্ন করুন।</p>
 
           <div class="suggestion-grid">
-            <button class="suggestion-card" data-prompt="আমাকে একটি আধুনিক ওয়েবসাইটের জন্য রেসপনসিভ CSS প্রাইসিং কার্ডের কোড লিখে দাও।">
-              <span class="s-icon">💻</span>
-              <div>
-                <strong>প্রফেশনাল কোডিং</strong>
-                <span>রেসপনসিভ CSS কার্ডের কোড লেখো</span>
-              </div>
+            <button class="suggestion-card" data-prompt="আমাকে একটি আধুনিক রেসপনসিভ ওয়েবসাইটের প্রাইসিং কার্ডের HTML ও CSS কোড লিখে দাও।">
+              <span>💻</span>
+              <div><strong>প্রফেশনাল কোডিং</strong><span>আধুনিক CSS কার্ডের কোড লেখো</span></div>
             </button>
-            <button class="suggestion-card" data-prompt="bhai amar ekta business idea lagbe low budget a bangladesh a korar moton">
-              <span class="s-icon">💡</span>
-              <div>
-                <strong>Banglish-এ প্রশ্ন করুন</strong>
-                <span>Low budget business idea Bangladesh</span>
-              </div>
+            <button class="suggestion-card" data-prompt="bhai amar ekta choto business idea lagbe bangladesh a kom takay korar moton">
+              <span>💡</span>
+              <div><strong>Banglish-এ কথা বলুন</strong><span>Kom takay business idea daw</span></div>
             </button>
-            <button class="suggestion-card" data-prompt="অফিসিয়াল বা চাকরির জন্য একটি স্মার্ট কভার লেটার ইংরেজিতে লিখে দাও ও বাংলায় বুঝিয়ে বলো।">
-              <span class="s-icon">✍️</span>
-              <div>
-                <strong>স্মার্ট রাইটিং</strong>
-                <span>কভার লেটার ও বাংলা অনুবাদ</span>
-              </div>
+            <button class="suggestion-card" data-prompt="চাকরির জন্য একটি স্মার্ট কভার লেটার ইংরেজিতে লিখে দাও ও বাংলায় বুঝিয়ে বলো।">
+              <span>✍️</span>
+              <div><strong>স্মার্ট রাইটিং</strong><span>কভার লেটার ও অনুবাদ</span></div>
             </button>
-            <button class="suggestion-card" data-prompt="সহজ ভাষায় উদাহরণ দিয়ে বুঝিয়ে দাও AI কীভাবে মানুষের সব ভাষা বুঝতে পারে।">
-              <span class="s-icon">🌐</span>
-              <div>
-                <strong>সহজ ব্যাখ্যা</strong>
-                <span>AI কীভাবে সব ভাষা বোঝে?</span>
-              </div>
+            <button class="suggestion-card" data-prompt="সহজ ভাষায় উদাহরণ দিয়ে বুঝিয়ে দাও AI কীভাবে কাজ করে।">
+              <span>🌐</span>
+              <div><strong>সহজ ব্যাখ্যা</strong><span>AI কীভাবে কাজ করে বলো</span></div>
             </button>
           </div>
         </div>
@@ -514,10 +481,10 @@
       </div>
 
       <!-- Input Dock -->
-      <div class="input-dock">
+      <div id="inputDock" class="input-dock">
         <form id="promptForm" class="input-box">
-          <button type="button" id="micLangBtn" class="mic-lang-btn" title="ভয়েস ভাষা পরিবর্তন করুন">বাং</button>
-          <button type="button" id="micBtn" class="dock-icon-btn" title="মুখে বলে টাইপ করুন">
+          <button type="button" id="micLangBtn" class="mic-lang-btn">বাং</button>
+          <button type="button" id="micBtn" class="dock-icon-btn" title="ভয়েস টাইপিং">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
           </button>
 
@@ -526,173 +493,319 @@
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
             data-gramm="false" data-enable-grammarly="false" translate="no"></textarea>
 
-          <button type="button" id="stopBtn" class="send-btn stop hidden" title="থামান">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-          </button>
-
-          <button type="submit" id="sendBtn" class="send-btn" title="পাঠান">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
+          <button type="button" id="stopBtn" class="send-btn stop hidden" title="থামান">■</button>
+          <button type="submit" id="sendBtn" class="send-btn" title="পাঠান">➤</button>
         </form>
-        <div class="disclaimer notranslate">Star AI Auto-Fallback চালু আছে • গুরুত্বপূর্ণ তথ্য যাচাই করে নিন</div>
+        <div id="activeTierHint" class="disclaimer notranslate">Star AI 1.0 Free • অটো-ফ্যালব্যাক চালু আছে</div>
       </div>
     </main>
   </div>
 
-  <!-- Settings Modal -->
-  <div id="settingsModal" class="modal hidden notranslate">
+  <!-- Upgrade & bKash/Nagad Modal -->
+  <div id="upgradeModal" class="modal hidden notranslate">
     <div class="modal-card">
       <div class="modal-header">
-        <h3>⚙️ Star AI সেটিংস ও ফ্রি APIs</h3>
-        <button id="closeSettingsBtn" class="icon-btn">✕</button>
+        <h3>👑 Star AI 1.1 Pro আনলক করুন</h3>
+        <button id="closeUpgradeBtn" class="icon-btn">✕</button>
       </div>
-
       <div class="modal-body">
-        <label class="field-label">সার্ভারে সচল ফ্রি API স্ট্যাটাস (Auto-Fallback)</label>
-        <div id="providerStatusGrid" class="provider-status-grid"></div>
+        <div class="price-hero">
+          <div>
+            <strong style="font-size:15px;">Star AI 1.1 Pro (হাই-স্পিড ও ডিপ কোডিং)</strong>
+            <div style="font-size:12px;color:var(--text-muted);" id="upgradeDaysTag">৭ দিনের আনলিমিটেড এক্সেস</div>
+          </div>
+          <div class="price-big" id="upgradePriceTag">৳100</div>
+        </div>
 
-        <label class="field-label">কাস্টম সিস্টেম নির্দেশনা (AI আচরণ)</label>
-        <textarea id="systemPromptInput" rows="2" class="field-input" autocomplete="off" spellcheck="false"></textarea>
+        <div id="proUnlockedBox" class="guide-box hidden" style="border-color:var(--ok); background:rgba(16,185,129,0.12);">
+          <strong style="color:var(--ok);">✅ আপনার Star AI 1.1 Pro চালু আছে!</strong>
+          <div id="proExpiryText" style="margin-top:4px;"></div>
+        </div>
 
-        <div class="divider"></div>
-        <p class="field-hint">চাইলে নিচে আপনার নিজের ফ্রি API Key বসাতে পারেন (এগুলো শুধু আপনার ব্রাউজারে সেভ থাকবে এবং Auto-Fallback হিসেবে কাজ করবে):</p>
+        <div id="upgradeFormArea" style="display:flex; flex-direction:column; gap:12px;">
+          <p id="payNoteText" style="font-size:12.5px; color:var(--text-muted);"></p>
 
-        <div class="keys-grid">
-          <div>
-            <label class="field-label-sm">Google Gemini Key (aistudio.google.com)</label>
-            <input id="keyGemini" type="password" class="field-input" placeholder="AIza..." autocomplete="off" />
+          <!-- bKash & Nagad Clickable Logo Cards -->
+          <div class="pay-cards">
+            <button type="button" id="bkashPayCard" class="pay-logo-card bkash selected">
+              <div class="pay-brand-row">
+                <svg width="28" height="28" viewBox="0 0 36 36"><rect width="36" height="36" rx="9" fill="#e2136e"/><path d="M18 7l9 10-7 3-2-13zm-9 10l9-10-2 13-7-3zm2 5l7-2 7 2-7 8-7-8z" fill="#fff"/></svg>
+                <strong style="color:#ff5da2; font-size:16px;">bKash</strong>
+              </div>
+              <div class="pay-num" id="bkashCardNum">01999928788</div>
+              <div class="pay-type-tag" id="bkashCardType">Send Money • ক্লিক করে কপি করুন</div>
+            </button>
+
+            <button type="button" id="nagadPayCard" class="pay-logo-card nagad">
+              <div class="pay-brand-row">
+                <svg width="28" height="28" viewBox="0 0 36 36"><rect width="36" height="36" rx="9" fill="#f76b1c"/><circle cx="18" cy="18" r="9" fill="none" stroke="#fff" stroke-width="2.6"/><path d="M14 18c2-4 6-4 8 0" stroke="#fff" stroke-width="2.4" fill="none"/></svg>
+                <strong style="color:#ff9c66; font-size:16px;">Nagad</strong>
+              </div>
+              <div class="pay-num" id="nagadCardNum">01999928788</div>
+              <div class="pay-type-tag" id="nagadCardType">Send Money • ক্লিক করে কপি করুন</div>
+            </button>
           </div>
-          <div>
-            <label class="field-label-sm">Groq Key (console.groq.com)</label>
-            <input id="keyGroq" type="password" class="field-input" placeholder="gsk_..." autocomplete="off" />
+
+          <div id="selectedPayGuide" class="guide-box"></div>
+
+          <!-- Pending Payment Status Box -->
+          <div id="pendingPayBox" class="guide-box hidden" style="border-color:var(--accent-2); background:rgba(99,102,241,0.12);">
+            <div>⏳ আপনার TrxID (<strong id="pendingTrxText"></strong>) যাচাই করা হচ্ছে।</div>
+            <button type="button" id="checkPayStatusBtn" class="secondary-btn" style="margin-top:8px;">🔄 অ্যাপ্রুভ হয়েছে কিনা চেক করুন</button>
           </div>
-          <div>
-            <label class="field-label-sm">OpenRouter Key (openrouter.ai)</label>
-            <input id="keyOpenrouter" type="password" class="field-input" placeholder="sk-or-..." autocomplete="off" />
-          </div>
-          <div>
-            <label class="field-label-sm">Cerebras Key (cloud.cerebras.ai)</label>
-            <input id="keyCerebras" type="password" class="field-input" placeholder="csk-..." autocomplete="off" />
-          </div>
-          <div>
-            <label class="field-label-sm">Mistral Key (console.mistral.ai)</label>
-            <input id="keyMistral" type="password" class="field-input" placeholder="Mistral API key..." autocomplete="off" />
+
+          <!-- Submit TrxID Form -->
+          <form id="payForm" style="display:flex; flex-direction:column; gap:8px;">
+            <input type="hidden" id="payMethodInput" value="bkash" />
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <input id="payUserPhone" class="field-input" placeholder="আপনার ফোন (017...)" required />
+              <input id="payTrxId" class="field-input" placeholder="Transaction ID (TrxID)" required />
+            </div>
+            <button type="submit" id="submitPayBtn" class="primary-btn">পেমেন্ট সাবমিট করুন</button>
+            <div id="paySubmitMsg" class="status-msg"></div>
+          </form>
+
+          <div class="divider"></div>
+
+          <!-- Activate with License Key -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <label style="font-size:12.5px; font-weight:600;">আগে থেকেই Pro কোড থাকলে এখানে বসান:</label>
+            <div style="display:flex; gap:8px;">
+              <input id="licenseCodeInput" class="field-input" placeholder="STAR-XXXX-XXXX-XXXX" />
+              <button type="button" id="activateCodeBtn" class="primary-btn" style="width:auto; white-space:nowrap;">আনলক</button>
+            </div>
+            <div id="licenseMsg" class="status-msg"></div>
           </div>
         </div>
-      </div>
-
-      <div class="modal-footer">
-        <button id="saveSettingsBtn" class="primary-btn">সেভ করুন</button>
       </div>
     </div>
   </div>
 
+  <div id="toastBox" class="toast hidden"></div>
+
   <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script>
-    const DEFAULT_SYSTEM_PROMPT =
-      "You are Star AI, a brilliant, helpful multilingual assistant fluent in Bengali (বাংলা), Banglish (Bengali in Roman letters), English, Hindi, Arabic, and every world language.";
+    const el = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[m]));
 
-    const savedKeys = (() => {
-      try {
-        return JSON.parse(localStorage.getItem("star_ai_keys") || "{}");
-      } catch {
-        return {};
+    function getDeviceId() {
+      let id = localStorage.getItem("star_ai_device_id");
+      if (!id) {
+        id = "dev_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem("star_ai_device_id", id);
       }
-    })();
+      return id;
+    }
+
+    function getTodayStr() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function getDailyCount() {
+      try {
+        const d = JSON.parse(localStorage.getItem("star_ai_daily") || "{}");
+        return d.date === getTodayStr() ? (d.count || 0) : 0;
+      } catch { return 0; }
+    }
+
+    function incDailyCount() {
+      const count = getDailyCount() + 1;
+      localStorage.setItem("star_ai_daily", JSON.stringify({ date: getTodayStr(), count }));
+      updateUsageUI();
+    }
 
     let state = {
-      chats: (() => {
-        try { return JSON.parse(localStorage.getItem("star_ai_chats") || "[]"); } catch { return []; }
-      })(),
+      chats: (() => { try { return JSON.parse(localStorage.getItem("star_ai_chats") || "[]"); } catch { return []; } })(),
       currentChatId: localStorage.getItem("star_ai_current_id") || null,
       theme: localStorage.getItem("star_ai_theme") || "dark",
-      model: localStorage.getItem("star_ai_model_v3") || "auto",
+      tier: "1.0",
       langMode: localStorage.getItem("star_ai_lang") || "auto",
       micLang: localStorage.getItem("star_ai_mic_lang") || "bn-BD",
-      systemPrompt: localStorage.getItem("star_ai_sys") || DEFAULT_SYSTEM_PROMPT,
-      clientKeys: {
-        gemini: savedKeys.gemini || "",
-        groq: savedKeys.groq || "",
-        openrouter: savedKeys.openrouter || "",
-        cerebras: savedKeys.cerebras || "",
-        mistral: savedKeys.mistral || "",
+      licenseCode: localStorage.getItem("star_ai_license") || "",
+      pendingTrx: localStorage.getItem("star_ai_pending_trx") || "",
+      deviceId: getDeviceId(),
+      proActive: false,
+      proExpiresAt: 0,
+      config: {
+        site_name: "Star AI",
+        welcome_title: "Star AI-তে স্বাগতম",
+        welcome_sub: "বাংলা, Banglish ও বিশ্বের যেকোনো ভাষায় প্রশ্ন করুন।",
+        free_daily_limit: 30,
+        pro_price: 100,
+        pro_days: 7,
+        bkash_enabled: true,
+        bkash_number: "01999928788",
+        bkash_type: "Send Money",
+        nagad_enabled: true,
+        nagad_number: "01999928788",
+        nagad_type: "Send Money",
+        payment_note: "bKash বা Nagad থেকে টাকা পাঠিয়ে নিচে আপনার নম্বর এবং Transaction ID (TrxID) সাবমিট করুন।",
       },
-      serverProviders: {},
     };
 
     let abortController = null;
     let isGenerating = false;
     let isComposing = false;
 
-    const el = (id) => document.getElementById(id);
+    if (window.marked) marked.setOptions({ breaks: true, gfm: true });
 
-    if (window.marked) {
-      marked.setOptions({ breaks: true, gfm: true });
+    function toast(msg) {
+      const t = el("toastBox");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      setTimeout(() => t.classList.add("hidden"), 2800);
     }
 
-    function init() {
+    async function init() {
       applyTheme(state.theme);
-      const validModels = [...el("modelSelect").options].map((o) => o.value);
-      if (!validModels.includes(state.model)) state.model = "auto";
-      el("modelSelect").value = state.model;
       el("langSelect").value = state.langMode;
       el("micLangBtn").textContent = state.micLang === "bn-BD" ? "বাং" : "EN";
 
       if (!state.chats.length) createNewChat(false);
-      else if (!state.chats.some((c) => c.id === state.currentChatId)) {
-        state.currentChatId = state.chats[0].id;
-      }
+      else if (!state.chats.some((c) => c.id === state.currentChatId)) state.currentChatId = state.chats[0].id;
 
       renderChatList();
       renderMessages();
-      checkServerProviders();
       bindEvents();
+      await fetchSiteConfig();
     }
 
-    async function checkServerProviders() {
-      const dot = el("serverStatusBadge");
+    async function fetchSiteConfig() {
       try {
-        const res = await fetch("/api/chat");
-        if (!res.ok) throw new Error();
+        const q = new URLSearchParams({
+          license_code: state.licenseCode,
+          device_id: state.deviceId,
+        });
+        const res = await fetch("/api/chat?" + q.toString());
+        if (!res.ok) return;
         const data = await res.json();
-        state.serverProviders = data?.providers || {};
-
-        const activeCount = Object.values(state.serverProviders).filter(Boolean).length;
-        const localCount = Object.values(state.clientKeys).filter(Boolean).length;
-        const total = new Set([
-          ...Object.keys(state.serverProviders).filter((k) => state.serverProviders[k]),
-          ...Object.keys(state.clientKeys).filter((k) => state.clientKeys[k]),
-        ]).size;
-
-        if (total > 0) {
-          dot.className = "status-dot online";
-          dot.textContent = `● ${total} API সচল`;
-        } else {
-          dot.className = "status-dot warn";
-          dot.textContent = "● Key প্রয়োজন";
+        if (data.config) state.config = { ...state.config, ...data.config };
+        if (data.proStatus) {
+          state.proActive = Boolean(data.proStatus.active);
+          state.proExpiresAt = Number(data.proStatus.expiresAt || 0);
+          if (!state.proActive && state.licenseCode) {
+            state.licenseCode = "";
+            localStorage.removeItem("star_ai_license");
+          }
         }
-      } catch {
-        dot.className = "status-dot warn";
-        dot.textContent = "● কানেক্ট হচ্ছে না";
-      }
-      renderProviderPills();
+        applyRemoteConfig();
+      } catch {}
     }
 
-    function renderProviderPills() {
-      const names = [
-        ["gemini", "Gemini"],
-        ["groq", "Groq"],
-        ["openrouter", "OpenRouter"],
-        ["cerebras", "Cerebras"],
-        ["mistral", "Mistral"],
-      ];
-      el("providerStatusGrid").innerHTML = names
-        .map(([k, label]) => {
-          const on = Boolean(state.serverProviders[k] || state.clientKeys[k]);
-          return `<span class="provider-pill ${on ? "active" : ""}">${on ? "✓" : "○"} ${label}</span>`;
-        })
-        .join("");
+    function applyRemoteConfig() {
+      const c = state.config;
+      el("brandNameText").textContent = c.site_name || "Star AI";
+      el("welcomeTitle").textContent = c.welcome_title || "Star AI-তে স্বাগতম";
+      el("welcomeSub").textContent = c.welcome_sub || "";
+
+      if (c.notice_enabled && c.notice_text) {
+        el("noticeText").textContent = "📢 " + c.notice_text;
+        el("noticeBanner").classList.remove("hidden");
+      }
+
+      if (c.maintenance_mode) {
+        el("maintMsgText").textContent = c.maintenance_msg || "সাইট আপডেট হচ্ছে।";
+        el("maintScreen").classList.remove("hidden");
+        el("chatContainer").classList.add("hidden");
+        el("inputDock").classList.add("hidden");
+      } else {
+        el("maintScreen").classList.add("hidden");
+        el("chatContainer").classList.remove("hidden");
+        el("inputDock").classList.remove("hidden");
+      }
+
+      // Billing UI
+      el("upgradePriceTag").textContent = `৳${c.pro_price || 100}`;
+      el("upgradeDaysTag").textContent = `${c.pro_days || 7} দিনের আনলিমিটেড প্রো এক্সেস`;
+      el("sbProSub").textContent = `মাত্র ${c.pro_price || 100} টাকায় ${c.pro_days || 7} দিন আনলিমিটেড!`;
+      el("payNoteText").textContent = c.payment_note || "";
+
+      el("bkashPayCard").classList.toggle("hidden", !c.bkash_enabled);
+      el("bkashCardNum").textContent = c.bkash_number || "01999928788";
+      el("bkashCardType").textContent = `${c.bkash_type || "Send Money"} • ক্লিক করে কপি`;
+
+      el("nagadPayCard").classList.toggle("hidden", !c.nagad_enabled);
+      el("nagadCardNum").textContent = c.nagad_number || "01999928788";
+      el("nagadCardType").textContent = `${c.nagad_type || "Send Money"} • ক্লিক করে কপি`;
+
+      updatePayGuide(el("payMethodInput").value);
+      updateProUI();
+      updateUsageUI();
+    }
+
+    function updateProUI() {
+      const daysLeft = Math.max(1, Math.ceil((state.proExpiresAt - Date.now()) / 86400000));
+      if (state.proActive) {
+        el("proLockIcon").textContent = "ACTIVE";
+        el("proLockIcon").style.background = "rgba(16,185,129,0.2)";
+        el("proLockIcon").style.color = "var(--ok)";
+        el("upgradeTopBtn").textContent = `👑 PRO • ${daysLeft} দিন`;
+        el("upgradeTopBtn").classList.add("is-pro");
+        el("sbProTitle").textContent = `👑 Star AI 1.1 Pro চালু`;
+        el("sbProSub").textContent = `মেয়াদ বাকি: ${daysLeft} দিন`;
+        el("proUnlockedBox").classList.remove("hidden");
+        el("proExpiryText").textContent = `মেয়াদ শেষ হবে: ${new Date(state.proExpiresAt).toLocaleString("bn-BD")}`;
+        el("upgradeFormArea").classList.add("hidden");
+      } else {
+        state.tier = "1.0";
+        el("proLockIcon").textContent = "🔒 Pro";
+        el("upgradeTopBtn").textContent = `👑 Pro নিন`;
+        el("upgradeTopBtn").classList.remove("is-pro");
+        el("proUnlockedBox").classList.add("hidden");
+        el("upgradeFormArea").classList.remove("hidden");
+      }
+      if (state.pendingTrx && !state.proActive) {
+        el("pendingTrxText").textContent = state.pendingTrx;
+        el("pendingPayBox").classList.remove("hidden");
+      } else {
+        el("pendingPayBox").classList.add("hidden");
+      }
+      updateTierButtons();
+    }
+
+    function updateTierButtons() {
+      el("tier10Btn").className = `tier-btn ${state.tier === "1.0" ? "active" : ""}`;
+      el("tier11Btn").className = `tier-btn ${state.tier === "1.1" ? "pro-active" : ""}`;
+      el("activeTierHint").textContent =
+        state.tier === "1.1"
+          ? "👑 Star AI 1.1 Pro সচল • সর্বোচ্চ স্পিড ও ডিপ রিজনিং"
+          : "✦ Star AI 1.0 Free • অটো-ফ্যালব্যাক চালু আছে";
+    }
+
+    function updateUsageUI() {
+      const limit = Number(state.config.free_daily_limit || 0);
+      if (state.proActive) {
+        el("freeUsageBadge").textContent = "1.1 Pro • আনলিমিটেড";
+      } else if (limit > 0) {
+        const left = Math.max(0, limit - getDailyCount());
+        el("freeUsageBadge").textContent = `আজ ফ্রি বাকি: ${left}/${limit}`;
+      } else {
+        el("freeUsageBadge").textContent = "1.0 Free • আনলিমিটেড";
+      }
+    }
+
+    function updatePayGuide(method) {
+      const c = state.config;
+      const isBkash = method === "bkash";
+      const num = isBkash ? c.bkash_number : c.nagad_number;
+      const type = isBkash ? c.bkash_type : c.nagad_type;
+      const name = isBkash ? "bKash" : "Nagad";
+
+      el("bkashPayCard").classList.toggle("selected", isBkash);
+      el("nagadPayCard").classList.toggle("selected", !isBkash);
+      el("payMethodInput").value = method;
+
+      el("selectedPayGuide").innerHTML =
+        `<strong>ধাপ ১:</strong> আপনার <strong>${name}</strong> অ্যাপে গিয়ে <strong>${esc(num)}</strong> নম্বরে <strong>৳${c.pro_price || 100}</strong> (<strong>${esc(type)}</strong>) পাঠান।<br>` +
+        `<strong>ধাপ ২:</strong> নিচে আপনার মোবাইল নম্বর এবং পাওয়া <strong>TrxID</strong> লিখে সাবমিট করুন।`;
+    }
+
+    function openUpgradeModal() {
+      updateProUI();
+      el("upgradeModal").classList.remove("hidden");
     }
 
     function saveState() {
@@ -704,12 +817,6 @@
       state.theme = theme;
       document.documentElement.setAttribute("data-theme", theme);
       localStorage.setItem("star_ai_theme", theme);
-    }
-
-    function escapeHtml(str) {
-      return (str || "").replace(/[&<>"']/g, (m) => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-      }[m]));
     }
 
     function createNewChat(focus = true) {
@@ -726,35 +833,25 @@
     function deleteChat(id, event) {
       event.stopPropagation();
       state.chats = state.chats.filter((c) => c.id !== id);
-      if (state.currentChatId === id) {
-        state.currentChatId = state.chats[0]?.id || null;
-      }
+      if (state.currentChatId === id) state.currentChatId = state.chats[0]?.id || null;
       if (!state.chats.length) createNewChat(false);
-      else {
-        saveState();
-        renderChatList();
-        renderMessages();
-      }
+      else { saveState(); renderChatList(); renderMessages(); }
     }
 
     function renderChatList() {
-      const query = el("chatSearch").value.trim().toLowerCase();
-      const filtered = state.chats.filter((c) => c.title.toLowerCase().includes(query));
+      const q = el("chatSearch").value.trim().toLowerCase();
+      const filtered = state.chats.filter((c) => c.title.toLowerCase().includes(q));
       el("chatList").innerHTML = filtered.length
-        ? filtered
-            .map(
-              (c) => `
-          <div class="chat-item ${c.id === state.currentChatId ? "active" : ""}" data-id="${c.id}">
-            <span class="chat-item-title">${escapeHtml(c.title)}</span>
-            <button class="chat-del-btn" data-del="${c.id}" title="মুছুন">✕</button>
-          </div>`
-            )
-            .join("")
-        : `<div style="padding:14px;font-size:12.5px;color:var(--text-muted);text-align:center">কোনো চ্যাট পাওয়া যায়নি</div>`;
+        ? filtered.map((c) => `
+            <div class="chat-item ${c.id === state.currentChatId ? "active" : ""}" data-id="${c.id}">
+              <span class="chat-item-title">${esc(c.title)}</span>
+              <button class="chat-del-btn" data-del="${c.id}">✕</button>
+            </div>`).join("")
+        : `<div style="padding:14px;font-size:12.5px;color:var(--text-muted);text-align:center">কোনো চ্যাট নেই</div>`;
     }
 
     function formatMarkdown(text) {
-      if (!window.marked) return `<p>${escapeHtml(text).replace(/\n/g, "<br>")}</p>`;
+      if (!window.marked) return `<p>${esc(text).replace(/\n/g, "<br>")}</p>`;
       return marked.parse(text || "");
     }
 
@@ -765,14 +862,11 @@
         if (code && window.hljs) hljs.highlightElement(code);
 
         const langMatch = code?.className.match(/language-([\w-]+)/);
-        const lang = langMatch ? langMatch[1] : "code";
-
         const wrap = document.createElement("div");
         wrap.className = "code-block-wrap";
-
         const header = document.createElement("div");
         header.className = "code-block-header";
-        header.innerHTML = `<span>${escapeHtml(lang)}</span>`;
+        header.innerHTML = `<span>${esc(langMatch ? langMatch[1] : "code")}</span>`;
 
         const copyBtn = document.createElement("button");
         copyBtn.className = "code-copy-btn";
@@ -782,7 +876,6 @@
           copyBtn.textContent = "Copied ✓";
           setTimeout(() => (copyBtn.textContent = "Copy"), 1500);
         };
-
         header.appendChild(copyBtn);
         pre.parentNode.insertBefore(wrap, pre);
         wrap.appendChild(header);
@@ -794,13 +887,11 @@
       const chat = state.chats.find((c) => c.id === state.currentChatId);
       const list = el("messagesList");
       const welcome = el("welcomeScreen");
-
       if (!chat || chat.messages.length === 0) {
         welcome.classList.remove("hidden");
         list.innerHTML = "";
         return;
       }
-
       welcome.classList.add("hidden");
       list.innerHTML = "";
       chat.messages.forEach((m, idx) =>
@@ -818,12 +909,10 @@
         if (msgIndex >= 0) {
           const editBtn = document.createElement("button");
           editBtn.className = "msg-edit-btn";
-          editBtn.title = "এডিট করে আবার পাঠান";
           editBtn.textContent = "✎";
           editBtn.onclick = () => editUserMessage(msgIndex);
           row.appendChild(editBtn);
         }
-
         const bubble = document.createElement("div");
         bubble.className = "user-bubble notranslate";
         bubble.textContent = content;
@@ -839,20 +928,17 @@
 
       const contentWrap = document.createElement("div");
       contentWrap.className = "bot-content-wrap";
-
       const body = document.createElement("div");
       body.className = "markdown-body notranslate";
+
       if (content === null) {
         body.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
       } else {
         body.innerHTML = formatMarkdown(content);
         enhanceCodeBlocks(body);
       }
-
       contentWrap.appendChild(body);
-      if (content !== null) {
-        contentWrap.appendChild(createActionButtons(content, isLast, meta));
-      }
+      if (content !== null) contentWrap.appendChild(createActionButtons(content, isLast, meta));
 
       row.appendChild(avatar);
       row.appendChild(contentWrap);
@@ -883,13 +969,14 @@
         actions.appendChild(regenBtn);
       }
 
-      if (meta?.label) {
+      if (meta?.tier) {
         const badge = document.createElement("span");
-        badge.className = `reply-meta-badge ${meta.fallback ? "fallback" : ""}`;
-        badge.textContent = meta.fallback ? `⚡ Auto-Fallback • ${meta.label}` : `✦ ${meta.label}`;
+        badge.className = `reply-meta-badge ${meta.tier === "1.1" ? "pro" : ""}`;
+        badge.textContent = meta.tier === "1.1"
+          ? `👑 Star AI 1.1 Pro • ${meta.label || ""}`
+          : `✦ Star AI 1.0 • ${meta.label || ""}`;
         actions.appendChild(badge);
       }
-
       return actions;
     }
 
@@ -901,33 +988,35 @@
       chat.messages = chat.messages.slice(0, idx);
       saveState();
       renderMessages();
-      const input = el("promptInput");
-      input.value = text;
-      input.dispatchEvent(new Event("input"));
-      input.focus();
+      el("promptInput").value = text;
+      el("promptInput").dispatchEvent(new Event("input"));
+      el("promptInput").focus();
     }
 
     function scrollToBottom() {
-      const c = el("chatContainer");
-      c.scrollTop = c.scrollHeight;
+      el("chatContainer").scrollTop = el("chatContainer").scrollHeight;
     }
 
     async function sendMessage(rawText) {
       const text = rawText.trim();
       if (isGenerating || !text) return;
+
+      const limit = Number(state.config.free_daily_limit || 0);
+      if (state.tier === "1.0" && !state.proActive && limit > 0 && getDailyCount() >= limit) {
+        toast("⚠️ আজকের ফ্রি লিমিট শেষ! Star AI 1.1 Pro আনলক করুন।");
+        openUpgradeModal();
+        return;
+      }
+
       const chat = state.chats.find((c) => c.id === state.currentChatId);
       if (!chat) return;
-
-      if (chat.messages.length === 0) {
-        chat.title = text.slice(0, 36);
-      }
+      if (chat.messages.length === 0) chat.title = text.slice(0, 36);
 
       const msgIndex = chat.messages.length;
       chat.messages.push({ role: "user", content: text });
       saveState();
       renderChatList();
       appendMessageRow("user", text, false, msgIndex);
-
       await runCompletion(chat);
     }
 
@@ -935,9 +1024,7 @@
       if (isGenerating) return;
       const chat = state.chats.find((c) => c.id === state.currentChatId);
       if (!chat || chat.messages.length < 1) return;
-      if (chat.messages[chat.messages.length - 1].role === "assistant") {
-        chat.messages.pop();
-      }
+      if (chat.messages[chat.messages.length - 1].role === "assistant") chat.messages.pop();
       saveState();
       renderMessages();
       await runCompletion(chat);
@@ -959,16 +1046,21 @@
           headers: { "Content-Type": "application/json" },
           signal: abortController.signal,
           body: JSON.stringify({
+            action: "chat",
             messages: chat.messages.slice(-16).map((m) => ({ role: m.role, content: m.content })),
-            model: state.model,
+            tier: state.tier,
             langMode: state.langMode,
-            systemPrompt: state.systemPrompt,
-            clientKeys: state.clientKeys,
+            licenseCode: state.licenseCode,
+            deviceId: state.deviceId,
           }),
         });
 
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
+          if (errData.proRequired) {
+            state.proActive = false;
+            updateProUI();
+          }
           throw new Error(errData.error || `সার্ভার এরর (${res.status})`);
         }
 
@@ -977,16 +1069,16 @@
         let buffer = "";
 
         const processLine = (rawLine) => {
-          const trimmed = rawLine.trim();
-          if (!trimmed.startsWith("data:")) return;
-          const dataStr = trimmed.slice(5).trim();
-          if (!dataStr || dataStr === "[DONE]") return;
+          const t = rawLine.trim();
+          if (!t.startsWith("data:")) return;
+          const d = t.slice(5).trim();
+          if (!d || d === "[DONE]") return;
           try {
-            const parsed = JSON.parse(dataStr);
-            if (parsed.error) throw new Error(parsed.error);
-            if (parsed.meta) replyMeta = parsed.meta;
-            if (parsed.text) {
-              fullReply += parsed.text;
+            const p = JSON.parse(d);
+            if (p.error) throw new Error(p.error);
+            if (p.meta) replyMeta = p.meta;
+            if (p.text) {
+              fullReply += p.text;
               botRefs.body.innerHTML = formatMarkdown(fullReply);
               scrollToBottom();
             }
@@ -1009,6 +1101,7 @@
         enhanceCodeBlocks(botRefs.body);
         chat.messages.push({ role: "assistant", content: fullReply, meta: replyMeta });
         saveState();
+        if (state.tier === "1.0" && !state.proActive) incDailyCount();
         botRefs.contentWrap.appendChild(createActionButtons(fullReply, true, replyMeta));
       } catch (err) {
         if (err.name === "AbortError") {
@@ -1021,7 +1114,7 @@
             botRefs.body.innerHTML = `<em style="color:var(--text-muted)">উত্তর থামানো হয়েছে।</em>`;
           }
         } else {
-          botRefs.body.innerHTML = `<div style="color:#ef4444">⚠️ <strong>সমস্যা হয়েছে:</strong> ${escapeHtml(err.message)}</div>`;
+          botRefs.body.innerHTML = `<div style="color:#ef4444">⚠️ ${esc(err.message)}</div>`;
           const retryBtn = document.createElement("button");
           retryBtn.className = "msg-act-btn";
           retryBtn.style.marginTop = "8px";
@@ -1042,6 +1135,40 @@
       el("sidebarOverlay").classList.remove("open");
     }
 
+    async function activateCode(code) {
+      el("licenseMsg").textContent = "⏳ যাচাই করা হচ্ছে...";
+      el("licenseMsg").style.color = "var(--accent)";
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "activate_license",
+            code: code.trim().toUpperCase(),
+            device_id: state.deviceId,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+
+        state.licenseCode = data.code;
+        state.proActive = true;
+        state.proExpiresAt = data.expires_at;
+        state.tier = "1.1";
+        state.pendingTrx = "";
+        localStorage.setItem("star_ai_license", state.licenseCode);
+        localStorage.removeItem("star_ai_pending_trx");
+        updateProUI();
+        updateUsageUI();
+        el("licenseMsg").textContent = "✅ অভিনন্দন! Star AI 1.1 Pro আনলক হয়েছে!";
+        el("licenseMsg").style.color = "var(--ok)";
+        toast("👑 Star AI 1.1 Pro চালু হয়েছে!");
+      } catch (err) {
+        el("licenseMsg").textContent = "❌ " + err.message;
+        el("licenseMsg").style.color = "var(--danger)";
+      }
+    }
+
     function bindEvents() {
       el("menuBtn").onclick = () => {
         el("sidebar").classList.add("open");
@@ -1049,51 +1176,118 @@
       };
       el("closeSidebarBtn").onclick = closeMobileSidebar;
       el("sidebarOverlay").onclick = closeMobileSidebar;
+      el("closeNoticeBtn").onclick = () => el("noticeBanner").classList.add("hidden");
 
       el("newChatBtn").onclick = () => createNewChat(true);
       el("chatSearch").oninput = renderChatList;
-
       el("chatList").onclick = (e) => {
         const delId = e.target.getAttribute("data-del");
         if (delId) return deleteChat(delId, e);
         const item = e.target.closest(".chat-item");
         if (item) {
           state.currentChatId = item.getAttribute("data-id");
-          saveState();
-          renderChatList();
-          renderMessages();
-          closeMobileSidebar();
+          saveState(); renderChatList(); renderMessages(); closeMobileSidebar();
         }
       };
 
       el("clearAllBtn").onclick = () => {
-        if (!confirm("সব চ্যাট হিস্ট্রি মুছে ফেলতে চান?")) return;
-        state.chats = [];
-        createNewChat(true);
+        if (!confirm("সব চ্যাট মুছতে চান?")) return;
+        state.chats = []; createNewChat(true);
       };
 
-      el("modelSelect").onchange = (e) => {
-        state.model = e.target.value;
-        localStorage.setItem("star_ai_model_v3", state.model);
+      el("tier10Btn").onclick = () => { state.tier = "1.0"; updateTierButtons(); };
+      el("tier11Btn").onclick = () => {
+        if (state.proActive) { state.tier = "1.1"; updateTierButtons(); }
+        else openUpgradeModal();
+      };
+
+      el("upgradeTopBtn").onclick = openUpgradeModal;
+      el("proSidebarCard").onclick = openUpgradeModal;
+      el("closeUpgradeBtn").onclick = () => el("upgradeModal").classList.add("hidden");
+
+      el("bkashPayCard").onclick = () => {
+        navigator.clipboard?.writeText(state.config.bkash_number || "01999928788");
+        updatePayGuide("bkash");
+        toast(`📋 bKash নম্বর ${state.config.bkash_number} কপি হয়েছে!`);
+      };
+      el("nagadPayCard").onclick = () => {
+        navigator.clipboard?.writeText(state.config.nagad_number || "01999928788");
+        updatePayGuide("nagad");
+        toast(`📋 Nagad নম্বর ${state.config.nagad_number} কপি হয়েছে!`);
+      };
+
+      el("payForm").onsubmit = async (e) => {
+        e.preventDefault();
+        el("paySubmitMsg").textContent = "⏳ সাবমিট হচ্ছে...";
+        el("paySubmitMsg").style.color = "var(--accent)";
+        try {
+          const trx = el("payTrxId").value.trim();
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "submit_payment",
+              user_phone: el("payUserPhone").value.trim(),
+              method: el("payMethodInput").value,
+              trx_id: trx,
+              amount: Number(state.config.pro_price || 100),
+              plan_days: Number(state.config.pro_days || 7),
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+
+          state.pendingTrx = trx;
+          localStorage.setItem("star_ai_pending_trx", trx);
+          el("pendingTrxText").textContent = trx;
+          el("pendingPayBox").classList.remove("hidden");
+          el("paySubmitMsg").textContent = "✅ পেমেন্ট রিকোয়েস্ট জমা হয়েছে! অ্যাপ্রুভ হলেই আনলক হবে।";
+          el("paySubmitMsg").style.color = "var(--ok)";
+          el("payTrxId").value = "";
+        } catch (err) {
+          el("paySubmitMsg").textContent = "❌ " + err.message;
+          el("paySubmitMsg").style.color = "var(--danger)";
+        }
+      };
+
+      el("checkPayStatusBtn").onclick = async () => {
+        if (!state.pendingTrx) return;
+        try {
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "check_payment", trx_id: state.pendingTrx }),
+          });
+          const data = await res.json();
+          if (data.status === "approved" && data.license_key) {
+            await activateCode(data.license_key);
+          } else if (data.status === "rejected") {
+            toast("❌ পেমেন্টটি রিজেক্ট করা হয়েছে। সঠিক TrxID দিন।");
+            state.pendingTrx = "";
+            localStorage.removeItem("star_ai_pending_trx");
+            updateProUI();
+          } else {
+            toast("⏳ এখনো পেন্ডিং আছে, অ্যাডমিন অ্যাপ্রুভ করলে চালু হবে।");
+          }
+        } catch (err) { toast("⚠️ " + err.message); }
+      };
+
+      el("activateCodeBtn").onclick = () => {
+        const code = el("licenseCodeInput").value.trim();
+        if (code) activateCode(code);
       };
 
       el("langSelect").onchange = (e) => {
         state.langMode = e.target.value;
         localStorage.setItem("star_ai_lang", state.langMode);
       };
-
-      el("themeToggleBtn").onclick = () =>
-        applyTheme(state.theme === "dark" ? "light" : "dark");
-
+      el("themeToggleBtn").onclick = () => applyTheme(state.theme === "dark" ? "light" : "dark");
       el("exportChatBtn").onclick = () => {
         const chat = state.chats.find((c) => c.id === state.currentChatId);
-        if (!chat || !chat.messages.length) return alert("ডাউনলোড করার মতো কোনো চ্যাট নেই!");
-        const md = chat.messages
-          .map((m) => `### ${m.role === "user" ? "You" : "Star AI"}\n${m.content}\n`)
-          .join("\n---\n\n");
-        const blob = new Blob([md], { type: "text/markdown" });
+        if (!chat || !chat.messages.length) return toast("ডাউনলোড করার মতো চ্যাট নেই!");
+        const md = chat.messages.map((m) => `### ${m.role === "user" ? "You" : "Star AI"}\n${m.content}\n`).join("\n---\n\n");
         const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
+        a.href = URL.createObjectURL(new Blob([md], { type: "text/markdown" }));
         a.download = `${chat.title.replace(/\s+/g, "_")}.md`;
         a.click();
       };
@@ -1121,7 +1315,6 @@
         input.style.height = "auto";
         sendMessage(val);
       };
-
       el("stopBtn").onclick = () => abortController?.abort();
 
       document.querySelectorAll(".suggestion-card").forEach((btn) => {
@@ -1138,16 +1331,11 @@
       if (SpeechRec) {
         let rec = null;
         el("micBtn").onclick = () => {
-          if (el("micBtn").classList.contains("listening") && rec) {
-            rec.stop();
-            return;
-          }
+          if (el("micBtn").classList.contains("listening") && rec) return rec.stop();
           rec = new SpeechRec();
           rec.lang = state.micLang;
-          rec.interimResults = false;
           el("micBtn").classList.add("listening");
           rec.start();
-
           rec.onresult = (e) => {
             const spoken = e.results?.[0]?.[0]?.transcript || "";
             if (spoken) {
@@ -1162,32 +1350,6 @@
         el("micBtn").style.display = "none";
         el("micLangBtn").style.display = "none";
       }
-
-      el("settingsBtn").onclick = () => {
-        renderProviderPills();
-        el("systemPromptInput").value = state.systemPrompt;
-        el("keyGemini").value = state.clientKeys.gemini;
-        el("keyGroq").value = state.clientKeys.groq;
-        el("keyOpenrouter").value = state.clientKeys.openrouter;
-        el("keyCerebras").value = state.clientKeys.cerebras;
-        el("keyMistral").value = state.clientKeys.mistral;
-        el("settingsModal").classList.remove("hidden");
-      };
-      el("closeSettingsBtn").onclick = () => el("settingsModal").classList.add("hidden");
-      el("saveSettingsBtn").onclick = () => {
-        state.systemPrompt = el("systemPromptInput").value.trim() || DEFAULT_SYSTEM_PROMPT;
-        state.clientKeys = {
-          gemini: el("keyGemini").value.trim(),
-          groq: el("keyGroq").value.trim(),
-          openrouter: el("keyOpenrouter").value.trim(),
-          cerebras: el("keyCerebras").value.trim(),
-          mistral: el("keyMistral").value.trim(),
-        };
-        localStorage.setItem("star_ai_sys", state.systemPrompt);
-        localStorage.setItem("star_ai_keys", JSON.stringify(state.clientKeys));
-        el("settingsModal").classList.add("hidden");
-        checkServerProviders();
-      };
     }
 
     init();
