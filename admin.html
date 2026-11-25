@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="bn" translate="no" class="notranslate">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google" content="notranslate" />
+  <title>Star AI — Master Admin Control Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080a0f;
+      --panel: #111520;
+      --elevated: #171c2b;
+      --hover: #1f263a;
+      --border: rgba(255, 255, 255, 0.085);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #f59e0b;
+      --accent-2: #6366f1;
+      --ok: #10b981;
+      --danger: #ef4444;
+      --bkash: #e2136e;
+      --nagad: #f76b1c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Hind Siliguri', 'Inter', system-ui, sans-serif;
+      min-height: 100dvh;
+    }
+    .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.25); border-radius: 99px; }
+
+    /* Login View */
+    .login-wrap {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: radial-gradient(circle at top, rgba(245,158,11,0.12), transparent 55%);
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .logo-badge {
+      width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-size: 26px; color: #fff;
+      box-shadow: 0 0 30px rgba(245,158,11,0.3);
+    }
+    .login-card h1 { font-size: 22px; margin-bottom: 4px; }
+    .login-card p { font-size: 13.5px; color: var(--muted); margin-bottom: 20px; }
+    .pass-group { position: relative; margin-bottom: 14px; }
+    .input, .select, .textarea {
+      width: 100%; padding: 11px 13px; border-radius: 11px;
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--text); font-family: inherit; font-size: 14px; outline: none;
+    }
+    .input:focus, .select:focus, .textarea:focus { border-color: var(--accent); }
+    .toggle-pass {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 14px;
+    }
+    .btn {
+      padding: 10px 16px; border-radius: 11px; border: 1px solid var(--border);
+      background: var(--elevated); color: var(--text); font-family: inherit;
+      font-size: 13.5px; font-weight: 600; cursor: pointer; transition: 0.18s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:hover { background: var(--hover); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #ea580c);
+      border: none; color: #fff;
+    }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-ok { background: rgba(16,185,129,0.16); color: var(--ok); border-color: rgba(16,185,129,0.35); }
+    .btn-danger { background: rgba(239,68,68,0.15); color: var(--danger); border-color: rgba(239,68,68,0.35); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+    .w-full { width: 100%; }
+    .err-text { color: var(--danger); font-size: 13px; margin-top: 10px; min-height: 18px; }
+
+    /* Admin Layout */
+    .admin-shell { display: flex; min-height: 100dvh; }
+    .sidebar {
+      width: 260px; background: var(--panel); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0; z-index: 40;
+      transition: transform 0.25s ease;
+    }
+    .sb-top { padding: 18px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .sb-logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; font-size: 18px; color: #fff;
+    }
+    .sb-title { font-weight: 700; font-size: 16px; }
+    .sb-sub { font-size: 11px; color: var(--accent); font-weight: 700; }
+    .nav-list { padding: 12px 10px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      width: 100%; text-align: left; padding: 10px 12px; border-radius: 11px;
+      border: none; background: transparent; color: var(--muted);
+      font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-item:hover { background: var(--hover); color: var(--text); }
+    .nav-item.active { background: rgba(245,158,11,0.14); color: var(--accent); }
+    .nav-badge {
+      font-size: 11px; padding: 1px 7px; border-radius: 99px;
+      background: var(--danger); color: #fff;
+    }
+    .sb-footer { padding: 14px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+
+    /* Main Content */
+    .content-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      height: 62px; padding: 0 20px; border-bottom: 1px solid var(--border);
+      background: var(--panel); display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .tb-left { display: flex; align-items: center; gap: 10px; }
+    .tb-right { display: flex; align-items: center; gap: 8px; }
+    .main-scroll { flex: 1; padding: 20px; overflow-y: auto; max-width: 1240px; width: 100%; margin: 0 auto; }
+
+    .alert-banner {
+      background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35);
+      color: #fcd34d; padding: 13px 16px; border-radius: 12px; margin-bottom: 18px;
+      font-size: 13.5px; line-height: 1.6;
+    }
+
+    /* Cards & Grids */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 14px; margin-bottom: 22px; }
+    .kpi-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 15px; padding: 16px;
+    }
+    .kpi-label { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+    .kpi-val { font-size: 24px; font-weight: 700; }
+    .kpi-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+    .section-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+      padding: 18px; margin-bottom: 18px;
+    }
+    .section-head {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      gap: 10px; margin-bottom: 14px;
+    }
+    .section-head h2 { font-size: 17px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 13px; font-weight: 600; color: var(--muted); }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+    th { color: var(--muted); font-size: 12px; font-weight: 600; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .pill {
+      display: inline-block; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; font-weight: 700;
+    }
+    .pill-pending { background: rgba(245,158,11,0.16); color: var(--accent); }
+    .pill-approved, .pill-active, .pill-ok { background: rgba(16,185,129,0.16); color: var(--ok); }
+    .pill-rejected, .pill-revoked, .pill-err { background: rgba(239,68,68,0.16); color: var(--danger); }
+    .pill-bkash { background: rgba(226,19,110,0.2); color: #ff5da2; }
+    .pill-nagad { background: rgba(247,107,28,0.2); color: #ff9c66; }
+
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; }
+
+    /* API Provider Tester Cards */
+    .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .prov-card {
+      background: var(--elevated); border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .prov-top { display: flex; justify-content: space-between; align-items: center; }
+    .prov-controls { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+    .switch-row { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+    .switch-row input { width: 17px; height: 17px; accent-color: var(--accent); cursor: pointer; }
+    .test-out { font-size: 12px; color: var(--muted); min-height: 18px; word-break: break-word; }
+
+    /* Key Result Box */
+    .key-box {
+      margin-top: 12px; padding: 12px 14px; border-radius: 12px;
+      background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.35);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+      display: grid; place-items: center; padding: 16px; z-index: 80;
+    }
+    .modal-card {
+      width: 100%; max-width: 440px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 18px; padding: 20px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; background: var(--elevated);
+      border: 1px solid var(--accent); color: var(--text); padding: 11px 18px;
+      border-radius: 12px; font-size: 13.5px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 99;
+    }
+
+    .mobile-only { display: none; }
+    .overlay { display: none; }
+    @media (max-width: 820px) {
+      .mobile-only { display: inline-flex; }
+      .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.open { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 30; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login View -->
+  <div id="loginView" class="login-wrap">
+    <form id="loginForm" class="login-card">
+      <div class="logo-badge">✦</div>
+      <h1>Star AI Master Admin</h1>
+      <p>সিস্টেম, পেমেন্ট, লাইসেন্স ও API কন্ট্রোল প্যানেল</p>
+      <div class="pass-group">
+        <input id="adminPassInput" type="password" class="input" placeholder="মাস্টার পাসওয়ার্ড লিখুন..." autocomplete="current-password" required />
+        <button type="button" id="togglePassBtn" class="toggle-pass">👁️</button>
+      </div>
+      <button id="loginBtn" type="submit" class="btn btn-primary w-full">অ্যাডমিন প্যানেলে প্রবেশ করুন</button>
+      <div id="loginError" class="err-text"></div>
+    </form>
+  </div>
+
+  <!-- Admin Dashboard -->
+  <div id="adminApp" class="admin-shell hidden">
+    <div id="sidebarOverlay" class="overlay"></div>
+
+    <aside id="sidebar" class="sidebar">
+      <div class="sb-top">
+        <div class="sb-logo">✦</div>
+        <div>
+          <div class="sb-title">Star AI</div>
+          <div class="sb-sub">MASTER ADMIN</div>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+        <button class="nav-item active" data-tab="overview"><span>📊 ড্যাশবোর্ড</span></button>
+        <button class="nav-item" data-tab="payments"><span>💳 পেমেন্ট (bKash/Nagad)</span> <span id="navPendingBadge" class="nav-badge hidden">0</span></button>
+        <button class="nav-item" data-tab="licenses"><span>🔑 প্রো কোড ও ইউজার</span></button>
+        <button class="nav-item" data-tab="models"><span>🤖 AI ও Auto-Fallback</span></button>
+        <button class="nav-item" data-tab="billing"><span>💰 প্রাইসিং ও নম্বর</span></button>
+        <button class="nav-item" data-tab="site"><span>🎛️ সাইট ও নোটিশ</span></button>
+        <button class="nav-item" data-tab="logs"><span>📜 লগ ও ব্যাকআপ</span></button>
+      </nav>
+
+      <div class="sb-footer">
+        <a href="/" target="_blank" class="btn w-full">🌐 মূল সাইট দেখুন</a>
+        <button id="logoutBtn" class="btn btn-danger w-full">লগআউট</button>
+      </div>
+    </aside>
+
+    <div class="content-area">
+      <header class="topbar">
+        <div class="tb-left">
+          <button id="mobileMenuBtn" class="btn btn-sm mobile-only">☰ মেনু</button>
+          <strong id="pageTitle">ড্যাশবোর্ড ওভারভিউ</strong>
+        </div>
+        <div class="tb-right">
+          <button id="refreshBtn" class="btn btn-sm">↻ রিফ্রেশ</button>
+        </div>
+      </header>
+
+      <main class="main-scroll">
+        <div id="dbBanner" class="alert-banner hidden">
+          ⚠️ <strong>Cloudflare D1 Database (`DB`) এখনো Bind করা হয়নি!</strong>
+          পেমেন্ট, প্রো কোড এবং সেটিংস স্থায়ীভাবে সেভ রাখতে Cloudflare ড্যাশবোর্ড → আপনার Pages প্রজেক্ট → <strong>Settings → Bindings → + Add → D1 database → Variable name: <code>DB</code></strong> দিয়ে Save করুন এবং <strong>Retry deployment</strong> দিন। (নিচের API Tester এখনই কাজ করবে!)
+        </div>
+
+        <!-- TAB 1: OVERVIEW -->
+        <section id="tab-overview" class="tab-pane">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">মোট চ্যাট রিকোয়েস্ট</div>
+              <div class="kpi-val" id="kpiTotalReq">0</div>
+              <div class="kpi-sub" id="kpiFreePro">1.0 Free: 0 | 1.1 Pro: 0</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">পেন্ডিং পেমেন্ট</div>
+              <div class="kpi-val" id="kpiPendingPay" style="color:var(--accent)">0</div>
+              <div class="kpi-sub">যাচাইয়ের অপেক্ষায়</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">মোট অনুমোদিত আয়</div>
+              <div class="kpi-val" id="kpiRevenue" style="color:var(--ok)">৳0</div>
+              <div class="kpi-sub">bKash & Nagad</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">সচল Pro ইউজার</div>
+              <div class="kpi-val" id="kpiActivePro" style="color:#818cf8">0</div>
+              <div class="kpi-sub">অ্যাক্টিভ লাইসেন্স</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">সচল ফ্রি API Key</div>
+              <div class="kpi-val" id="kpiApiCount">0 / 5</div>
+              <div class="kpi-sub">Auto-Fallback রেডি</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="section-card">
+              <div class="section-head"><h2>সাম্প্রতিক পেমেন্ট রিকোয়েস্ট</h2></div>
+              <div id="overviewPayments" class="table-wrap"></div>
+            </div>
+            <div class="section-card">
+              <div class="section-head"><h2>সর্বশেষ AI ব্যবহার ও ফলব্যাক লগ</h2></div>
+              <div id="overviewLogs" class="table-wrap"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: PAYMENTS -->
+        <section id="tab-payments" class="tab-pane hidden">
+          <div class="section-card">
+            <div class="section-head">
+              <h2>bKash ও Nagad পেমেন্ট ম্যানেজার</h2>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <select id="payFilter" class="select" style="width:auto;">
+                  <option value="all">সব পেমেন্ট</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <input id="paySearch" class="input" style="width:190px;" placeholder="ফোন বা TrxID খুঁজুন..." />
+                <button id="addManualPayBtn" class="btn btn-primary">+ ম্যানুয়াল পেমেন্ট</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>সময়</th>
+                    <th>ইউজার ফোন</th>
+                    <th>মাধ্যম</th>
+                    <th>TrxID</th>
+                    <th>টাকা / দিন</th>
+                    <th>স্ট্যাটাস</th>
+                    <th>Pro কোড</th>
+                    <th>অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 3: LICENSES -->
+        <section id="tab-licenses" class="tab-pane hidden">
+          <div class="section-card">
+            <div class="section-head"><h2>নতুন 1.1 Pro অ্যাক্টিভেশন কোড তৈরি করুন</h2></div>
+            <div class="grid-3">
+              <div class="field">
+                <label>ইউজারের নাম বা ফোন নম্বর</label>
+                <input id="genPhone" class="input" placeholder="যেমন: 017XXXXXXXX" />
+              </div>
+              <div class="field">
+                <label>মেয়াদ (দিন)</label>
+                <input id="genDays" type="number" class="input" value="7" min="1" max="3650" />
+              </div>
+              <div class="field">
+                <label>নোট (ঐচ্ছিক)</label>
+                <input id="genNote" class="input" placeholder="যেমন: bKash 100 Tk" />
+              </div>
+            </div>
+            <button id="genKeyBtn" class="btn btn-primary">✦ Pro কোড তৈরি করুন</button>
+
+            <div id="genResultBox" class="key-box hidden">
+              <div>
+                <div style="font-size:12px;color:var(--ok)">নতুন Pro কোড তৈরি হয়েছে:</div>
+                <strong id="genKeyCode" class="mono" style="font-size:16px;"></strong>
+              </div>
+              <button id="copyGenKeyBtn" class="btn btn-ok btn-sm">📋 কপি করুন</button>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-head">
+              <h2>সকল Pro লাইসেন্স তালিকা</h2>
+              <input id="licSearch" class="input" style="width:220px;" placeholder="কোড বা ফোন খুঁজুন..." />
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>কোড</th>
+                    <th>ইউজার/ফোন</th>
+                    <th>মেয়াদ</th>
+                    <th>স্ট্যাটাস</th>
+                    <th>ডিভাইস</th>
+                    <th>মেয়াদ শেষ</th>
+                    <th>অ্যাকশন</th>
+                  </tr>
+                </thead>
+                <tbody id="licensesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4: AI MODELS & FALLBACK -->
+        <section id="tab-models" class="tab-pane hidden">
+          <div class="section-card">
+            <div class="section-head">
+              <h2>API Key হেলথ টেস্ট ও Auto-Fallback প্রায়োরিটি</h2>
+              <button id="testAllApisBtn" class="btn btn-primary btn-sm">⚡ সব API একসাথে টেস্ট করুন</button>
+            </div>
+            <div id="providerCardsGrid" class="provider-grid"></div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-head"><h2>Star AI 1.0 (Free) ও Star AI 1.1 (Pro) কনফিগারেশন</h2></div>
+            <div class="grid-2">
+              <div>
+                <div class="field">
+                  <label>Star AI 1.0 (Free) — ডেইলি মেসেজ লিমিট (০ = আনলিমিটেড)</label>
+                  <input id="freeLimitInput" type="number" class="input" value="30" min="0" />
+                </div>
+                <div class="field">
+                  <label>Star AI 1.0 — সিস্টেম নির্দেশনা</label>
+                  <textarea id="freePromptInput" rows="3" class="textarea"></textarea>
+                </div>
+              </div>
+              <div>
+                <div class="field">
+                  <label>Star AI 1.1 (Pro) — প্রাইমারি প্রো মডেল</label>
+                  <select id="proModelInput" class="select">
+                    <option value="gemini::gemini-3.6-flash">Gemini 3.6 Flash (Pro)</option>
+                    <option value="gemini::gemini-3.8-flash">Gemini 3.8 Flash</option>
+                    <option value="groq::openai/gpt-oss-120b">Groq GPT-OSS 120B</option>
+                    <option value="cerebras::qwen-3-235b-a22b-instruct-2507">Cerebras Qwen 235B</option>
+                    <option value="openrouter::openrouter/free">OpenRouter Free</option>
+                    <option value="mistral::mistral-small-latest">Mistral Small</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Star AI 1.1 (Pro) — স্পেশাল সিস্টেম প্রম্পট</label>
+                  <textarea id="proPromptInput" rows="3" class="textarea"></textarea>
+                </div>
+              </div>
+            </div>
+            <button id="saveModelsBtn" class="btn btn-primary">💾 AI সেটিংস সেভ করুন</button>
+          </div>
+        </section>
+
+        <!-- TAB 5: BILLING & BKASH/NAGAD -->
+        <section id="tab-billing" class="tab-pane hidden">
+          <div class="section-card">
+            <div class="section-head"><h2>Star AI 1.1 Pro প্রাইসিং এবং bKash / Nagad নম্বর</h2></div>
+            <div class="grid-2">
+              <div class="field">
+                <label>প্রো প্ল্যানের দাম (টাকা)</label>
+                <input id="proPriceInput" type="number" class="input" value="100" />
+              </div>
+              <div class="field">
+                <label>মেয়াদ (দিন)</label>
+                <input id="proDaysInput" type="number" class="input" value="7" />
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="section-card" style="margin-bottom:0; background:var(--elevated);">
+                <div class="section-head" style="margin-bottom:10px;">
+                  <strong style="color:#ff5da2;">bKash সেটিংস</strong>
+                  <label class="switch-row"><input id="bkashEnabled" type="checkbox" checked /> চালু রাখুন</label>
+                </div>
+                <div class="field">
+                  <label>bKash নম্বর</label>
+                  <input id="bkashNum" class="input" value="01999928788" />
+                </div>
+                <div class="field">
+                  <label>অ্যাকাউন্টের ধরন</label>
+                  <select id="bkashType" class="select">
+                    <option value="Send Money">Personal (Send Money)</option>
+                    <option value="Cash Out">Agent (Cash Out)</option>
+                    <option value="Payment">Merchant (Payment)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="section-card" style="margin-bottom:0; background:var(--elevated);">
+                <div class="section-head" style="margin-bottom:10px;">
+                  <strong style="color:#ff9c66;">Nagad সেটিংস</strong>
+                  <label class="switch-row"><input id="nagadEnabled" type="checkbox" checked /> চালু রাখুন</label>
+                </div>
+                <div class="field">
+                  <label>Nagad নম্বর</label>
+                  <input id="nagadNum" class="input" value="01999928788" />
+                </div>
+                <div class="field">
+                  <label>অ্যাকাউন্টের ধরন</label>
+                  <select id="nagadType" class="select">
+                    <option value="Send Money">Personal (Send Money)</option>
+                    <option value="Cash Out">Agent (Cash Out)</option>
+                    <option value="Payment">Merchant (Payment)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:14px;">
+              <label>পেমেন্ট নির্দেশনা (পপআপে দেখাবে)</label>
+              <textarea id="payNoteInput" rows="2" class="textarea"></textarea>
+            </div>
+            <button id="saveBillingBtn" class="btn btn-primary">💾 বিলিং সেটিংস সেভ করুন</button>
+          </div>
+        </section>
+
+        <!-- TAB 6: SITE & NOTICE -->
+        <section id="tab-site" class="tab-pane hidden">
+          <div class="section-card">
+            <div class="section-head"><h2>সাইট ব্র্যান্ডিং, লাইভ নোটিশ ও মেইনটেন্যান্স কন্ট্রোল</h2></div>
+            <div class="grid-2">
+              <div class="field">
+                <label>সাইটের নাম</label>
+                <input id="siteNameInput" class="input" value="Star AI" />
+              </div>
+              <div class="field">
+                <label>ওয়েলকাম হেডলাইন</label>
+                <input id="welcomeTitleInput" class="input" value="Star AI-তে স্বাগতম" />
+              </div>
+            </div>
+            <div class="field">
+              <label>ওয়েলকাম সাব-টাইটেল</label>
+              <input id="welcomeSubInput" class="input" />
+            </div>
+
+            <div class="section-card" style="background:var(--elevated);">
+              <div class="section-head" style="margin-bottom:8px;">
+                <strong>📢 লাইভ নোটিশ ব্যানার (সাইটের ওপরে দেখাবে)</strong>
+                <label class="switch-row"><input id="noticeEnabled" type="checkbox" /> নোটিশ চালু করুন</label>
+              </div>
+              <input id="noticeTextInput" class="input" placeholder="যেমন: 🎉 মাত্র ১০০ টাকায় ৭ দিনের জন্য Star AI 1.1 Pro আনলক করুন!" />
+            </div>
+
+            <div class="section-card" style="background:var(--elevated);">
+              <div class="section-head" style="margin-bottom:8px;">
+                <strong style="color:var(--danger);">🚧 মেইনটেন্যান্স মোড (সাইট সাময়িক বন্ধ রাখা)</strong>
+                <label class="switch-row"><input id="maintEnabled" type="checkbox" /> মেইনটেন্যান্স চালু</label>
+              </div>
+              <input id="maintMsgInput" class="input" placeholder="যেমন: সাইট আপডেট হচ্ছে, কিছুক্ষণ পর আবার চেষ্টা করুন।" />
+            </div>
+
+            <div class="field">
+              <label>ব্লক করা শব্দ (কমা দিয়ে লিখুন — কেউ এই শব্দ পাঠালে ব্লক হবে)</label>
+              <input id="blockedWordsInput" class="input" placeholder="যেমন: spamword1, badword2" />
+            </div>
+            <button id="saveSiteBtn" class="btn btn-primary">💾 সাইট সেটিংস সেভ করুন</button>
+          </div>
+        </section>
+
+        <!-- TAB 7: LOGS & BACKUP -->
+        <section id="tab-logs" class="tab-pane hidden">
+          <div class="section-card">
+            <div class="section-head">
+              <h2>সিস্টেম লগ ও ডাটা ব্যাকআপ</h2>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button id="exportBackupBtn" class="btn btn-ok btn-sm">⬇ সম্পূর্ণ ব্যাকআপ (JSON)</button>
+                <button id="clearLogsBtn" class="btn btn-danger btn-sm">🗑 পুরোনো লগ মুছুন</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>সময়</th>
+                    <th>ভার্সন</th>
+                    <th>API ও মডেল</th>
+                    <th>ফ্যালব্যাক</th>
+                    <th>স্ট্যাটাস</th>
+                    <th>সময় (ms)</th>
+                    <th>নোট/এরর</th>
+                  </tr>
+                </thead>
+                <tbody id="logsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Manual Payment Modal -->
+  <div id="manualPayModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="section-head">
+        <h3>+ ম্যানুয়াল পেমেন্ট যোগ করুন</h3>
+        <button id="closeManualPayBtn" class="btn btn-sm">✕</button>
+      </div>
+      <div class="field"><label>ইউজার ফোন</label><input id="mPayPhone" class="input" placeholder="017..." /></div>
+      <div class="grid-2">
+        <div class="field">
+          <label>মাধ্যম</label>
+          <select id="mPayMethod" class="select">
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+          </select>
+        </div>
+        <div class="field"><label>TrxID</label><input id="mPayTrx" class="input" placeholder="TrxID..." /></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>টাকা</label><input id="mPayAmount" type="number" class="input" value="100" /></div>
+        <div class="field"><label>দিন</label><input id="mPayDays" type="number" class="input" value="7" /></div>
+      </div>
+      <label class="switch-row" style="margin-bottom:14px;">
+        <input id="mPayAutoApprove" type="checkbox" checked /> সাথে সাথে Approve করে Pro কোড বানাও
+      </label>
+      <button id="saveManualPayBtn" class="btn btn-primary w-full">সেভ করুন</button>
+    </div>
+  </div>
+
+  <div id="toastBox" class="toast hidden"></div>
+
+  <script>
+    let adminToken = sessionStorage.getItem("star_admin_token") || "";
+    let dashboardData = null;
+
+    const el = (id) => document.getElementById(id);
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[m]));
+
+    function toast(msg) {
+      const t = el("toastBox");
+      t.textContent = msg;
+      t.classList.remove("hidden");
+      setTimeout(() => t.classList.add("hidden"), 2800);
+    }
+
+    function fmtDate(ts) {
+      if (!ts) return "—";
+      return new Date(Number(ts)).toLocaleString("bn-BD", {
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    async function api(action, payload = null) {
+      const isGet = payload === null;
+      const url = isGet ? `/api/admin?action=${encodeURIComponent(action)}` : "/api/admin";
+      const headers = { "Content-Type": "application/json" };
+      if (adminToken) headers["Authorization"] = `Bearer ${adminToken}`;
+
+      const res = await fetch(url, {
+        method: isGet ? "GET" : "POST",
+        headers,
+        body: isGet ? undefined : JSON.stringify({ action, ...payload }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 401 && action !== "login") {
+        logout();
+        throw new Error("সেশন শেষ হয়েছে, আবার লগইন করুন।");
+      }
+      if (!res.ok) throw new Error(data.error || "অপারেশন ব্যর্থ হয়েছে");
+      return data;
+    }
+
+    function logout() {
+      adminToken = "";
+      sessionStorage.removeItem("star_admin_token");
+      el("adminApp").classList.add("hidden");
+      el("loginView").classList.remove("hidden");
+    }
+
+    async function loadDashboard() {
+      try {
+        dashboardData = await api("dashboard");
+        el("loginView").classList.add("hidden");
+        el("adminApp").classList.remove("hidden");
+        renderAll();
+      } catch (err) {
+        toast("⚠️ " + err.message);
+      }
+    }
+
+    function renderAll() {
+      const d = dashboardData;
+      if (!d) return;
+
+      el("dbBanner").classList.toggle("hidden", Boolean(d.dbConnected));
+      const s = d.settings || {};
+
+      // KPIs
+      el("kpiTotalReq").textContent = d.stats?.totalReq || 0;
+      el("kpiFreePro").textContent = `1.0 Free: ${d.stats?.freeReq || 0} | 1.1 Pro: ${d.stats?.proReq || 0}`;
+      el("kpiPendingPay").textContent = d.stats?.pendingPay || 0;
+      el("kpiRevenue").textContent = `৳${d.stats?.revenue || 0}`;
+      el("kpiActivePro").textContent = d.stats?.activePro || 0;
+
+      const activeApis = Object.values(d.providers || {}).filter(Boolean).length;
+      el("kpiApiCount").textContent = `${activeApis} / 5`;
+
+      const badge = el("navPendingBadge");
+      badge.textContent = d.stats?.pendingPay || 0;
+      badge.classList.toggle("hidden", !(d.stats?.pendingPay > 0));
+
+      renderOverviewTables();
+      renderPayments();
+      renderLicenses();
+      renderProviders();
+      renderSettingsForms(s);
+      renderLogs();
+    }
+
+    function renderOverviewTables() {
+      const pays = (dashboardData.payments || []).slice(0, 5);
+      el("overviewPayments").innerHTML = pays.length
+        ? `<table><thead><tr><th>ফোন</th><th>মাধ্যম</th><th>TrxID</th><th>স্ট্যাটাস</th></tr></thead><tbody>
+          ${pays.map((p) => `<tr>
+            <td>${esc(p.user_phone)}</td>
+            <td><span class="pill pill-${esc(p.method)}">${esc(p.method)}</span></td>
+            <td class="mono">${esc(p.trx_id)}</td>
+            <td><span class="pill pill-${esc(p.status)}">${esc(p.status)}</span></td>
+          </tr>`).join("")}</tbody></table>`
+        : `<p style="color:var(--muted);font-size:13px;">এখনো কোনো পেমেন্ট রিকোয়েস্ট নেই।</p>`;
+
+      const logs = (dashboardData.logs || []).slice(0, 5);
+      el("overviewLogs").innerHTML = logs.length
+        ? `<table><thead><tr><th>ভার্সন</th><th>প্রোভাইডার</th><th>স্ট্যাটাস</th><th>সময়</th></tr></thead><tbody>
+          ${logs.map((l) => `<tr>
+            <td>${esc(l.tier)}</td>
+            <td>${esc(l.provider)}</td>
+            <td><span class="pill ${l.status === "ok" ? "pill-ok" : "pill-err"}">${esc(l.status)}</span></td>
+            <td>${l.latency_ms || 0} ms</td>
+          </tr>`).join("")}</tbody></table>`
+        : `<p style="color:var(--muted);font-size:13px;">এখনো কোনো লগ জমা হয়নি।</p>`;
+    }
+
+    function renderPayments() {
+      const filter = el("payFilter").value;
+      const q = el("paySearch").value.trim().toLowerCase();
+      const rows = (dashboardData.payments || []).filter((p) => {
+        if (filter !== "all" && p.status !== filter) return false;
+        if (q && !`${p.user_phone} ${p.trx_id} ${p.license_key || ""}`.toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      el("paymentsTableBody").innerHTML = rows.length
+        ? rows.map((p) => `<tr>
+            <td>${fmtDate(p.created_at)}</td>
+            <td><strong>${esc(p.user_phone)}</strong></td>
+            <td><span class="pill pill-${esc(p.method)}">${esc(p.method).toUpperCase()}</span></td>
+            <td class="mono">${esc(p.trx_id)}</td>
+            <td>৳${esc(p.amount)} / ${esc(p.plan_days)} দিন</td>
+            <td><span class="pill pill-${esc(p.status)}">${esc(p.status)}</span></td>
+            <td class="mono">${p.license_key ? `<button class="btn btn-sm" onclick="copyText('${esc(p.license_key)}')">📋 ${esc(p.license_key)}</button>` : "—"}</td>
+            <td>
+              ${p.status === "pending" ? `<button class="btn btn-ok btn-sm" onclick="handlePay(${p.id},'approve')">✓ Approve</button>
+              <button class="btn btn-danger btn-sm" onclick="handlePay(${p.id},'reject')">✕ Reject</button>` : ""}
+              <button class="btn btn-sm" onclick="handlePay(${p.id},'delete')">🗑</button>
+            </td>
+          </tr>`).join("")
+        : `<tr><td colspan="8" style="text-align:center;color:var(--muted);">কোনো তথ্য পাওয়া যায়নি</td></tr>`;
+    }
+
+    function renderLicenses() {
+      const q = el("licSearch").value.trim().toLowerCase();
+      const now = Date.now();
+      const rows = (dashboardData.licenses || []).filter((l) =>
+        !q || `${l.code} ${l.user_phone} ${l.note || ""}`.toLowerCase().includes(q)
+      );
+
+      el("licensesTableBody").innerHTML = rows.length
+        ? rows.map((l) => {
+            const expired = l.expires_at && Number(l.expires_at) < now;
+            const st = l.status === "revoked" ? "revoked" : expired ? "rejected" : "active";
+            const stText = l.status === "revoked" ? "Band/Revoked" : expired ? "Expired" : "Active";
+            return `<tr>
+              <td class="mono"><button class="btn btn-sm" onclick="copyText('${esc(l.code)}')">📋 ${esc(l.code)}</button></td>
+              <td>${esc(l.user_phone || "—")}<div style="font-size:11px;color:var(--muted)">${esc(l.note || "")}</div></td>
+              <td>${esc(l.days)} দিন</td>
+              <td><span class="pill pill-${st}">${stText}</span></td>
+              <td class="mono">${l.device_id ? "🔒 Linked" : "উন্মুক্ত"}</td>
+              <td>${fmtDate(l.expires_at)}</td>
+              <td>
+                <button class="btn btn-sm" onclick="updateLic('${esc(l.code)}','extend_7')" title="+৭ দিন বাড়ান">+7d</button>
+                <button class="btn btn-sm" onclick="updateLic('${esc(l.code)}','reset_device')" title="ডিভাইস রিসেট">🔓</button>
+                ${l.status === "revoked"
+                  ? `<button class="btn btn-ok btn-sm" onclick="updateLic('${esc(l.code)}','activate')">চালু</button>`
+                  : `<button class="btn btn-danger btn-sm" onclick="updateLic('${esc(l.code)}','revoke')">বন্ধ</button>`}
+                <button class="btn btn-sm" onclick="updateLic('${esc(l.code)}','delete')">🗑</button>
+              </td>
+            </tr>`;
+          }).join("")
+        : `<tr><td colspan="7" style="text-align:center;color:var(--muted);">কোনো Pro কোড নেই</td></tr>`;
+    }
+
+    function renderProviders() {
+      const providers = dashboardData.providers || {};
+      const cfg = (() => {
+        try { return JSON.parse(dashboardData.settings?.provider_config || "{}"); } catch { return {}; }
+      })();
+
+      const list = [
+        { id: "gemini", name: "Google Gemini", hint: "GEMINI_API_KEY" },
+        { id: "groq", name: "Groq", hint: "GROQ_API_KEY" },
+        { id: "openrouter", name: "OpenRouter", hint: "OPENROUTER_API_KEY" },
+        { id: "cerebras", name: "Cerebras", hint: "CEREBRAS_API_KEY" },
+        { id: "mistral", name: "Mistral AI", hint: "MISTRAL_API_KEY" },
+      ];
+
+      el("providerCardsGrid").innerHTML = list.map((p, i) => {
+        const hasKey = Boolean(providers[p.id]);
+        const enabled = cfg[p.id]?.enabled !== false;
+        const priority = cfg[p.id]?.priority ?? (i + 1);
+        return `
+          <div class="prov-card">
+            <div class="prov-top">
+              <strong>${p.name}</strong>
+              <span class="pill ${hasKey ? "pill-ok" : "pill-err"}">${hasKey ? "Key সেট আছে" : "Key নেই"}</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--muted)">Secret: <code class="mono">${p.hint}</code></div>
+            <div class="prov-controls">
+              <label class="switch-row">
+                <input type="checkbox" class="prov-enable" data-p="${p.id}" ${enabled ? "checked" : ""} /> চালু
+              </label>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+                অর্ডার: <input type="number" class="input prov-prio" data-p="${p.id}" value="${priority}" min="1" max="10" style="width:56px;padding:4px 8px;" />
+              </div>
+            </div>
+            <button class="btn btn-sm" onclick="testSingleProvider('${p.id}')" ${!hasKey ? "disabled" : ""}>▶ টেস্ট করুন</button>
+            <div id="testOut-${p.id}" class="test-out"></div>
+          </div>`;
+      }).join("");
+    }
+
+    function renderSettingsForms(s) {
+      el("freeLimitInput").value = s.free_daily_limit ?? "30";
+      el("freePromptInput").value = s.free_system_prompt || "You are Star AI 1.0, a helpful assistant fluent in Bengali, Banglish, and all languages.";
+      el("proModelInput").value = s.pro_model || "gemini::gemini-3.6-flash";
+      el("proPromptInput").value = s.pro_system_prompt || "You are Star AI 1.1 Pro, an expert senior developer & deep researcher fluent in Bengali, Banglish, and all world languages.";
+
+      el("proPriceInput").value = s.pro_price ?? "100";
+      el("proDaysInput").value = s.pro_days ?? "7";
+      el("bkashEnabled").checked = s.bkash_enabled !== "0";
+      el("bkashNum").value = s.bkash_number || "01999928788";
+      el("bkashType").value = s.bkash_type || "Send Money";
+      el("nagadEnabled").checked = s.nagad_enabled !== "0";
+      el("nagadNum").value = s.nagad_number || "01999928788";
+      el("nagadType").value = s.nagad_type || "Send Money";
+      el("payNoteInput").value = s.payment_note || "bKash বা Nagad থেকে টাকা পাঠিয়ে নিচে আপনার নম্বর এবং Transaction ID (TrxID) সাবমিট করুন।";
+
+      el("siteNameInput").value = s.site_name || "Star AI";
+      el("welcomeTitleInput").value = s.welcome_title || "Star AI-তে স্বাগতম";
+      el("welcomeSubInput").value = s.welcome_sub || "বাংলা, Banglish ও বিশ্বের যেকোনো ভাষায় প্রশ্ন করুন।";
+      el("noticeEnabled").checked = s.notice_enabled === "1";
+      el("noticeTextInput").value = s.notice_text || "";
+      el("maintEnabled").checked = s.maintenance_mode === "1";
+      el("maintMsgInput").value = s.maintenance_msg || "সাইট রক্ষণাবেক্ষণ চলছে, অনুগ্রহ করে কিছুক্ষণ পর আসুন।";
+      el("blockedWordsInput").value = s.blocked_words || "";
+    }
+
+    function renderLogs() {
+      const logs = dashboardData.logs || [];
+      el("logsTableBody").innerHTML = logs.length
+        ? logs.map((l) => `<tr>
+            <td>${fmtDate(l.created_at)}</td>
+            <td>${esc(l.tier)}</td>
+            <td class="mono">${esc(l.provider)} / ${esc(l.model)}</td>
+            <td>${l.is_fallback ? "⚡ হ্যাঁ" : "না"}</td>
+            <td><span class="pill ${l.status === "ok" ? "pill-ok" : "pill-err"}">${esc(l.status)}</span></td>
+            <td>${l.latency_ms || 0} ms</td>
+            <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;">${esc(l.error_msg || "OK")}</td>
+          </tr>`).join("")
+        : `<tr><td colspan="7" style="text-align:center;color:var(--muted);">কোনো লগ নেই</td></tr>`;
+    }
+
+    window.copyText = (txt) => {
+      navigator.clipboard.writeText(txt);
+      toast("কপি হয়েছে: " + txt);
+    };
+
+    window.handlePay = async (id, op) => {
+      if (op === "delete" && !confirm("এই পেমেন্ট রেকর্ড মুছে ফেলতে চান?")) return;
+      try {
+        const res = await api("handle_payment", { id, op });
+        if (res.license_key) toast(`✅ Approved! নতুন কোড: ${res.license_key}`);
+        else toast("সফলভাবে আপডেট হয়েছে!");
+        await loadDashboard();
+      } catch (e) { toast("❌ " + e.message); }
+    };
+
+    window.updateLic = async (code, op) => {
+      if (op === "delete" && !confirm("কোডটি মুছে ফেলতে চান?")) return;
+      try {
+        await api("update_license", { code, op });
+        toast("✅ লাইসেন্স আপডেট হয়েছে!");
+        await loadDashboard();
+      } catch (e) { toast("❌ " + e.message); }
+    };
+
+    window.testSingleProvider = async (provider) => {
+      const out = el("testOut-" + provider);
+      out.textContent = "⏳ টেস্ট চলছে...";
+      out.style.color = "var(--accent)";
+      try {
+        const res = await api("test_provider", { provider });
+        out.textContent = `✅ কাজ করছে (${res.latencyMs}ms): "${res.reply}"`;
+        out.style.color = "var(--ok)";
+      } catch (e) {
+        out.textContent = `❌ ${e.message}`;
+        out.style.color = "var(--danger)";
+      }
+    };
+
+    async function saveSettingsObj(obj) {
+      try {
+        await api("save_settings", { settings: obj });
+        toast("✅ সেটিংস সেভ হয়েছে!");
+        await loadDashboard();
+      } catch (e) { toast("❌ " + e.message); }
+    }
+
+    // Event Bindings
+    el("togglePassBtn").onclick = () => {
+      const inp = el("adminPassInput");
+      inp.type = inp.type === "password" ? "text" : "password";
+    };
+
+    el("loginForm").onsubmit = async (e) => {
+      e.preventDefault();
+      el("loginError").textContent = "";
+      el("loginBtn").disabled = true;
+      try {
+        const res = await api("login", { password: el("adminPassInput").value });
+        adminToken = res.token;
+        sessionStorage.setItem("star_admin_token", adminToken);
+        el("adminPassInput").value = "";
+        await loadDashboard();
+      } catch (err) {
+        el("loginError").textContent = err.message;
+      } finally {
+        el("loginBtn").disabled = false;
+      }
+    };
+
+    el("logoutBtn").onclick = logout;
+    el("refreshBtn").onclick = loadDashboard;
+
+    el("mobileMenuBtn").onclick = () => {
+      el("sidebar").classList.add("open");
+      el("sidebarOverlay").classList.add("open");
+    };
+    el("sidebarOverlay").onclick = () => {
+      el("sidebar").classList.remove("open");
+      el("sidebarOverlay").classList.remove("open");
+    };
+
+    document.querySelectorAll(".nav-item").forEach((btn) => {
+      btn.onclick = () => {
+        document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".tab-pane").forEach((p) => p.classList.add("hidden"));
+        btn.classList.add("active");
+        el("tab-" + btn.dataset.tab).classList.remove("hidden");
+        el("pageTitle").textContent = btn.innerText.replace(/\d+$/, "").trim();
+        el("sidebar").classList.remove("open");
+        el("sidebarOverlay").classList.remove("open");
+      };
+    });
+
+    el("payFilter").onchange = renderPayments;
+    el("paySearch").oninput = renderPayments;
+    el("licSearch").oninput = renderLicenses;
+
+    el("addManualPayBtn").onclick = () => el("manualPayModal").classList.remove("hidden");
+    el("closeManualPayBtn").onclick = () => el("manualPayModal").classList.add("hidden");
+    el("saveManualPayBtn").onclick = async () => {
+      try {
+        const res = await api("add_manual_payment", {
+          user_phone: el("mPayPhone").value.trim(),
+          method: el("mPayMethod").value,
+          trx_id: el("mPayTrx").value.trim(),
+          amount: Number(el("mPayAmount").value || 100),
+          plan_days: Number(el("mPayDays").value || 7),
+          auto_approve: el("mPayAutoApprove").checked,
+        });
+        el("manualPayModal").classList.add("hidden");
+        toast(res.license_key ? `✅ কোড তৈরি হয়েছে: ${res.license_key}` : "✅ পেমেন্ট যোগ হয়েছে!");
+        await loadDashboard();
+      } catch (e) { toast("❌ " + e.message); }
+    };
+
+    el("genKeyBtn").onclick = async () => {
+      try {
+        const res = await api("generate_license", {
+          phone: el("genPhone").value.trim() || "Direct User",
+          days: Number(el("genDays").value || 7),
+          note: el("genNote").value.trim(),
+        });
+        el("genKeyCode").textContent = res.code;
+        el("genResultBox").classList.remove("hidden");
+        toast("✅ নতুন Pro কোড তৈরি হয়েছে!");
+        await loadDashboard();
+      } catch (e) { toast("❌ " + e.message); }
+    };
+    el("copyGenKeyBtn").onclick = () => copyText(el("genKeyCode").textContent);
+
+    el("testAllApisBtn").onclick = () => {
+      const providers = dashboardData?.providers || {};
+      Object.keys(providers).forEach((p) => {
+        if (providers[p]) testSingleProvider(p);
+      });
+    };
+
+    el("saveModelsBtn").onclick = () => {
+      const cfg = {};
+      document.querySelectorAll(".prov-enable").forEach((chk) => {
+        const p = chk.dataset.p;
+        const prio = document.querySelector(`.prov-prio[data-p="${p}"]`)?.value || 5;
+        cfg[p] = { enabled: chk.checked, priority: Number(prio) };
+      });
+      saveSettingsObj({
+        provider_config: JSON.stringify(cfg),
+        free_daily_limit: el("freeLimitInput").value.trim(),
+        free_system_prompt: el("freePromptInput").value.trim(),
+        pro_model: el("proModelInput").value,
+        pro_system_prompt: el("proPromptInput").value.trim(),
+      });
+    };
+
+    el("saveBillingBtn").onclick = () => saveSettingsObj({
+      pro_price: el("proPriceInput").value.trim(),
+      pro_days: el("proDaysInput").value.trim(),
+      bkash_enabled: el("bkashEnabled").checked ? "1" : "0",
+      bkash_number: el("bkashNum").value.trim(),
+      bkash_type: el("bkashType").value,
+      nagad_enabled: el("nagadEnabled").checked ? "1" : "0",
+      nagad_number: el("nagadNum").value.trim(),
+      nagad_type: el("nagadType").value,
+      payment_note: el("payNoteInput").value.trim(),
+    });
+
+    el("saveSiteBtn").onclick = () => saveSettingsObj({
+      site_name: el("siteNameInput").value.trim(),
+      welcome_title: el("welcomeTitleInput").value.trim(),
+      welcome_sub: el("welcomeSubInput").value.trim(),
+      notice_enabled: el("noticeEnabled").checked ? "1" : "0",
+      notice_text: el("noticeTextInput").value.trim(),
+      maintenance_mode: el("maintEnabled").checked ? "1" : "0",
+      maintenance_msg: el("maintMsgInput").value.trim(),
+      blocked_words: el("blockedWordsInput").value.trim(),
+    });
+
+    el("exportBackupBtn").onclick = () => {
+      if (!dashboardData) return;
+      const blob = new Blob([JSON.stringify(dashboardData, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `star-ai-backup-${Date.now()}.json`;
+      a.click();
+    };
+
+    el("clearLogsBtn").onclick = async () => {
+      if (!confirm("সব পুরোনো লগ মুছে ফেলতে চান?")) return;
+      try {
+        await api("clear_logs", {});
+        toast("✅ লগ পরিষ্কার হয়েছে!");
+        await loadDashboard();
+      } catch (e) { toast("❌ " + e.message); }
+    };
+
+    if (adminToken) loadDashboard();
+  </script>
+</body>
+</html>
